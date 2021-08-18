@@ -3,7 +3,7 @@ from scp.utils.selfInfo import info
 
 
 @bot.on_message(bot.filters.user(info['_user_id']) & bot.command('start'))
-async def _start(_, message: bot.types.Message):
+async def _(_, message: bot.types.Message):
         try:
             me = await user.get_me()
         except ConnectionError:

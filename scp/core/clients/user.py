@@ -1,4 +1,4 @@
-from pyrogram import Client, filters, types
+from pyrogram import Client, filters, types, raw
 from scp.core.filters.Command import user_command as command
 from configparser import ConfigParser
 from kantex import md as Markdown
@@ -14,14 +14,14 @@ class User(Client):
     def __init__(
         self,
         name: str = 'scp-user',
-        aioclient: ClientSession = None
+        aioclient =  ClientSession
     ):
         self.name = name
         super().__init__(
             name,
             workers=8,
         )
-        self.aioclient = ClientSession(timeout=ClientTimeout(total=2))
+        self.aioclient = aioclient(timeout=ClientTimeout(total=2))
 
     async def start(self):
         await super().start()
@@ -57,11 +57,19 @@ class User(Client):
     async def getRequest(self, url:str):
         async with self.aioclient.get(url) as resp:
             return await resp.json()
+    
+    async def postRequest(
+        self,
+        url:str,
+        json: dict
+    ):
+        async with self.aioclient.post(url, json=json) as resp:
+            return await resp.json()
 
 
     
-
     filters = filters
+    raw = raw
     types = types
     md = Markdown
     _config = ConfigParser()

@@ -5,9 +5,9 @@ __PLUGIN__ = 'follow'
 __DOC__ = str(user.md.KanTeXDocument(
     user.md.Section('HTTP(s) Tools',
         user.md.SubSection('Redirect',
-            user.md.Italic('(*prefix)url {url}')),
+            user.md.Code('(*prefix)url {url}')),
         user.md.SubSection('IpInfo',
-            user.md.Italic('(*prefix)dns {ip_address} - * optional')))))
+            user.md.Code('(*prefix)dns {ip_address} - * optional')))))
 
 
 @user.on_message(user.filters.me & user.command('url'))

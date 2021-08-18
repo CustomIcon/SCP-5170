@@ -7,7 +7,7 @@ __PLUGIN__ = 'UserInfo'
 __DOC__ = str(user.md.KanTeXDocument(
     user.md.Section('Chat information resolver',
         user.md.SubSection('user info',
-            user.md.Italic('(*prefix)info {chat_id} or {user_id}')))))
+            user.md.Code('(*prefix)info {chat_id} or {user_id}')))))
 
 
 @user.on_message(
@@ -60,14 +60,18 @@ async def _(_, query: bot.types.InlineQuery):
             user.md.KeyValueItem(key='chat_id', value=u.id),
             user.md.KeyValueItem(key='type', value=u.type),
             user.md.KeyValueItem(key='title', value=u.title),
-            user.md.KeyValueItem(key='description', value=u.description),
             user.md.KeyValueItem(key='invite_link', value=u.invite_link),
             user.md.KeyValueItem(key='members_count', value=u.members_count),
             user.md.KeyValueItem(key='dc_id', value=u.dc_id),
             user.md.KeyValueItem(key='username', value=u.username)
         )
         keyboard = user.types.InlineKeyboardMarkup(
-            [[user.types.InlineKeyboardButton('Permissions', callback_data=f'cperm_{u.id}')]]
+            [
+                [
+                    user.types.InlineKeyboardButton('Permissions', callback_data=f'cperm_{u.id}'),
+                    user.types.InlineKeyboardButton('Description', callback_data=f'cdesc_{u.id}')
+                ]
+            ]
          ) if u.permissions else None
     else:
         text = user.md.Section(
@@ -80,7 +84,7 @@ async def _(_, query: bot.types.InlineQuery):
             user.md.KeyValueItem(key='dc_id', value=u.dc_id)
         )
         keyboard = user.types.InlineKeyboardMarkup(
-            [[user.types.InlineKeyboardButton('UserLink', url=f'tg://user?id={u.id}')]]
+            [[user.types.InlineKeyboardButton('UserLink', url=f'tg://user?id={u.id}'), user.types.InlineKeyboardButton('Description', callback_data=f'cdesc_{u.id}')]]
         )
     answers.append(
         user.types.InlineQueryResultArticle(
@@ -125,3 +129,10 @@ async def _(_, query:user.types.CallbackQuery):
         _text(
             (await user.get_chat(int(query.data.split("_")[1]))).permissions
         ), show_alert=True)
+
+
+@bot.on_callback_query(bot.filters.user(user.sudo) & bot.filters.regex('^cdesc_'))
+async def _(_, query:user.types.CallbackQuery):
+    chat = await user.get_chat(int(query.data.split("_")[1]))
+    await query.answer(
+        chat.description[:150] if chat.description else chat.bio, show_alert=True)
