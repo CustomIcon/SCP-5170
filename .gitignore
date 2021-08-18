@@ -117,4 +117,4 @@ bot.ini
 *.session-journal
 *.ini
 database.json
-*.txt
+scp/logs/*.txt

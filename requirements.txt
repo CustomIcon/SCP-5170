@@ -1,0 +1,9 @@
+async-lru==1.0.2
+attrify==3.0
+future==0.18.2
+kantex==0.2.0
+pyaes==1.6.1
+Pyrogram==1.2.9
+PySocks==1.7.1
+TgCrypto==1.2.2
+ujson==4.1.0
