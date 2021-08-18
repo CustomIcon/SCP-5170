@@ -4,13 +4,17 @@ from pyrogram import errors
 
 
 __PLUGIN__ = 'UserInfo'
+__DOC__ = str(user.md.KanTeXDocument(
+    user.md.Section('Chat information resolver',
+        user.md.SubSection('user info',
+            user.md.Italic('(*prefix)info {chat_id} or {user_id}')))))
 
 
 @user.on_message(
     user.filters.me &
     user.command('info'),
 )
-async def whois(_, message: user.types.Message):
+async def _(_, message: user.types.Message):
     cmd = message.command
     if not message.reply_to_message and len(cmd) == 1:
         get_user = message.from_user.id
@@ -28,7 +32,10 @@ async def whois(_, message: user.types.Message):
     try:
         Uid = (await user.get_chat(get_user)).id
         x = await user.get_inline_bot_results(info['_bot_username'], '_userInfo ' + str(Uid))
-    except errors.exceptions.bad_request_400.PeerIdInvalid as err:
+    except (
+        errors.exceptions.bad_request_400.PeerIdInvalid,
+        errors.exceptions.bad_request_400.BotResponseTimeout
+    ) as err:
         return await message.reply(err, quote=True)
     for m in x.results:
         await message.reply_inline_bot_result(x.query_id, m.id, quote=True)
@@ -59,7 +66,9 @@ async def _(_, query: bot.types.InlineQuery):
             user.md.KeyValueItem(key='dc_id', value=u.dc_id),
             user.md.KeyValueItem(key='username', value=u.username)
         )
-        keyboard = [[user.types.InlineKeyboardButton('Permissions', callback_data=f'cperm_{u.id}')]]
+        keyboard = user.types.InlineKeyboardMarkup(
+            [[user.types.InlineKeyboardButton('Permissions', callback_data=f'cperm_{u.id}')]]
+         ) if u.permissions else None
     else:
         text = user.md.Section(
             'UserInfo:',
@@ -70,14 +79,14 @@ async def _(_, query: bot.types.InlineQuery):
             user.md.KeyValueItem(key='username', value=u.username),
             user.md.KeyValueItem(key='dc_id', value=u.dc_id)
         )
-        keyboard = [[user.types.InlineKeyboardButton('UserLink', url=f'tg://user?id={u.id}')]]
+        keyboard = user.types.InlineKeyboardMarkup(
+            [[user.types.InlineKeyboardButton('UserLink', url=f'tg://user?id={u.id}')]]
+        )
     answers.append(
         user.types.InlineQueryResultArticle(
             title='Info',
             input_message_content=user.types.InputTextMessageContent(text),
-            reply_markup=user.types.InlineKeyboardMarkup(
-                keyboard
-            )
+            reply_markup=keyboard
         )
     )
     await query.answer(
@@ -112,5 +121,7 @@ def _text(perms):
 
 @bot.on_callback_query(bot.filters.user(user.sudo) & bot.filters.regex('^cperm_'))
 async def _(_, query:user.types.CallbackQuery):
-    perms = (await user.get_chat(int(query.data.split("_")[1]))).permissions
-    await query.answer(_text(perms), show_alert=True)
+    await query.answer(
+        _text(
+            (await user.get_chat(int(query.data.split("_")[1]))).permissions
+        ), show_alert=True)

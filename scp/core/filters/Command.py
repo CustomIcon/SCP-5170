@@ -59,7 +59,7 @@ def user_command(
 
 def bot_command(
     commands: str or List[str],
-    prefixes: str or List[str] = prefixes,
+    prefixes: str or List[str] = "/",
     case_sensitive: bool = False,
 ):
     """

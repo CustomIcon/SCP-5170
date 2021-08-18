@@ -1,5 +1,3 @@
-from scp import log
-
 def __list_all_modules():
     from os.path import dirname, basename, isfile
     import glob
@@ -14,5 +12,4 @@ def __list_all_modules():
 
 
 ALL_MODULES = sorted(__list_all_modules())
-log.info('Userbot module loaded: %s', str(ALL_MODULES))
 __all__ = ALL_MODULES + ['ALL_MODULES']
