@@ -51,21 +51,21 @@ async def reboot():
         imported_module = importlib.import_module('scp.plugins.user.' + modul)
         if hasattr(
             imported_module,
-            '__MODULE__',
-        ) and imported_module.__MODULE__:
-            imported_module.__MODULE__ = imported_module.__MODULE__
+            '__PLUGIN__',
+        ) and imported_module.__PLUGIN__:
+            imported_module.__PLUGIN__ = imported_module.__PLUGIN__
         if hasattr(
             imported_module,
-            '__MODULE__',
-        ) and imported_module.__MODULE__:
-            if imported_module.__MODULE__.lower() not in HELP_COMMANDS:
+            '__PLUGIN__',
+        ) and imported_module.__PLUGIN__:
+            if imported_module.__PLUGIN__.lower() not in HELP_COMMANDS:
                 HELP_COMMANDS[
-                    imported_module.__MODULE__.lower()
+                    imported_module.__PLUGIN__.lower()
                 ] = imported_module
             else:
                 raise Exception(
                     "Can't have two modules with the same name!",
                 )
-        if hasattr(imported_module, '__HELP__') and imported_module.__HELP__:
-            HELP_COMMANDS[imported_module.__MODULE__.lower()] = imported_module
+        if hasattr(imported_module, '__DOC__') and imported_module.__DOC__:
+            HELP_COMMANDS[imported_module.__PLUGIN__.lower()] = imported_module
         importlib.reload(imported_module)

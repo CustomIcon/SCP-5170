@@ -1,4 +1,6 @@
-from pyrogram import Client
+from pyrogram import Client, filters, types
+from scp.core.filters.Command import bot_command as command
+from configparser import ConfigParser
 
 
 class Bot(Client):
@@ -16,3 +18,14 @@ class Bot(Client):
     async def stop(self, *args):
         await super().stop()
         print('bot stopped. Bye.')
+
+    def command(self, *args):
+        return command(*args)
+        
+    filters = filters
+    types = types
+    _config = ConfigParser()
+    _config.read('config.ini')
+    sudo = []
+    for x in _config.get('scp-5170', 'SudoList').split():
+        sudo.append(int(x))

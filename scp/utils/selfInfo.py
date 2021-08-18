@@ -1,12 +1,13 @@
-from scp import user, bot
+import scp
 
 info = {}
 
 
 async def updateInfo():
-    global info
-    u = await user.get_me()
-    b = await bot.get_me()
+    u = await scp.user.get_me()
+    b = await scp.bot.get_me()
+    if u.id not in scp.user.sudo:
+        scp.user.sudo.append(u.id)
     info['_user_id'] = u.id
     info['_user_username'] = u.username
     info['_bot_id'] = b.id

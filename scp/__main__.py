@@ -13,8 +13,8 @@ loop = asyncio.get_event_loop()
 async def start_bot():
     await bot.start()
     await user.start()
+    await updateInfo()
     await asyncio.gather(
-        updateInfo(),
         loadBotPlugins(),
         loadUserPlugins(),
         idle()

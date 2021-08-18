@@ -5,6 +5,9 @@ import time
 from .core.clients import Bot, User
 
 RUNTIME = time.time()
+
+__version__ = '0.0.1'
+
 if sys.version_info[0] < 3 or sys.version_info[1] < 8:
     logging.error('Python version Lower than 3.8! Abort!')
     sys.exit()

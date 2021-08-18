@@ -1,5 +1,7 @@
 from pyrogram import Client, filters, types
-from scp.core.filters.Command import command
+from scp.core.filters.Command import user_command as command
+from configparser import ConfigParser
+from kantex import md as Markdown
 
 
 class User(Client):
@@ -20,7 +22,12 @@ class User(Client):
     
     def command(self, *args):
         return command(*args)
-    
-    me = filters.me
 
+    filters = filters
     types = types
+    md = Markdown
+    _config = ConfigParser()
+    _config.read('config.ini')
+    sudo = []
+    for x in _config.get('scp-5170', 'SudoList').split():
+        sudo.append(int(x))
