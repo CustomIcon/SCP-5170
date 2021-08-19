@@ -1,5 +1,6 @@
 from scp import user
 from pyzxing import BarCodeReader
+from io import BytesIO
 import os
 from pyrogram import errors
 
@@ -81,14 +82,12 @@ async def _(_, message: user.types.Message):
         try:
             await message.reply(doc, quote=True)
         except errors.exceptions.bad_request_400.MessageTooLong:
-            filename = 'qrRead.txt'
-            with open(filename, 'w+', encoding='utf8') as out_file:
-                out_file.write(str(doc))
+            data = BytesIO(str(out).encode())
+            data.name = 'qrRead.txt'
             await message.reply_document(
-                document=filename,
+                document=data,
                 quote=True
             )
-            os.remove(filename)
         os.remove(f)
 
 

@@ -3,8 +3,9 @@ class Temp:
     def __init__(
         self,
         schema=None,
+        data = dict
     ):
-        self.data = {}
+        self.data = data
         self.schema = schema
 
     def add(self, key, value):

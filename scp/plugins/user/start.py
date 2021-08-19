@@ -17,8 +17,8 @@ async def _(_, message: user.types.Message):
 async def _(_, query: bot.types.InlineQuery):
     start = time.time()
     m = await user.send_message("me", '.')
-    await m.delete()
     end = time.time()
+    await m.delete()
     with user.storage.lock, user.storage.conn:
         groups = user.storage.conn.execute(
             'SELECT id FROM peers WHERE type in ("group", "supergroup", "channel")'
@@ -28,18 +28,22 @@ async def _(_, query: bot.types.InlineQuery):
         ).fetchall()
     text = user.md.KanTeXDocument(
         user.md.Section('SCP-5170',
-                user.md.SubSection(
-                    user.md.Bold('version: ' + __version__),
+            user.md.SubSection(f'version: {__version__}',
                 user.md.KeyValueItem(
-                    user.md.Bold('dc_id'), user.md.Code(await user.storage.dc_id())),
+                    user.md.Bold('dc_id'),
+                    user.md.Code(await user.storage.dc_id())),
                 user.md.KeyValueItem(
-                    user.md.Bold('ping_dc'), user.md.Code(f'{round((end - start) * 1000, 3)}ms')),
+                    user.md.Bold('ping_dc'),
+                    user.md.Code(f'{round((end - start) * 1000, 3)}ms')),
                 user.md.KeyValueItem(
-                    user.md.Bold('peer_users'), user.md.Code(f'{len(users)} users')),
+                    user.md.Bold('peer_users'),
+                    user.md.Code(f'{len(users)} users')),
                 user.md.KeyValueItem(
-                    user.md.Bold('peer_groups'), user.md.Code(f'{len(groups)} groups')),
+                    user.md.Bold('peer_groups'),
+                    user.md.Code(f'{len(groups)} groups')),
                 user.md.KeyValueItem(
-                    user.md.Bold('scp_uptime'), user.md.Code(get_readable_time(time.time() - RUNTIME))))))
+                    user.md.Bold('scp_uptime'),
+                    user.md.Code(get_readable_time(time.time() - RUNTIME))))))
     await query.answer(
         results=[
             bot.types.InlineQueryResultArticle(

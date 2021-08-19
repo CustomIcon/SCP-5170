@@ -44,7 +44,7 @@ class User(Client):
         try:
             async with self.aioclient.get(url, headers=headers) as response:
                 url: URL = response.url
-        except (ClientError, asyncio.TimeoutError, socket.gaierror) as err:
+        except (ClientError, asyncio.TimeoutError, socket.gaierror):
             return old_url
 
         if base_domain:
@@ -57,7 +57,8 @@ class User(Client):
     async def getRequest(self, url:str):
         async with self.aioclient.get(url) as resp:
             return await resp.json()
-    
+
+
     async def postRequest(
         self,
         url:str,
@@ -65,9 +66,20 @@ class User(Client):
     ):
         async with self.aioclient.post(url, json=json) as resp:
             return await resp.json()
-
-
     
+
+    async def netcat(self, host: str, port: int, content: str):
+        reader, writer = await asyncio.open_connection(
+            host, port
+        )
+        writer.write(content.encode())
+        await writer.drain()
+        data = (await reader.read(100)).decode().strip("\n\x00")
+        writer.close()
+        await writer.wait_closed()
+        return data
+
+
     filters = filters
     raw = raw
     types = types

@@ -1,7 +1,6 @@
 import traceback, sys
-import os
 
-from io import StringIO
+from io import StringIO, BytesIO
 
 from scp.utils.meval import meval
 from scp import user
@@ -21,7 +20,7 @@ async def eval(client: user, message: user.types.Message):
     redirected_error = sys.stderr = StringIO()
     stdout, stderr, exc = None, None, None
     try:
-        await meval(cmd, client, message)
+        await meval(cmd, globals(), **locals())
     except Exception:
         exc = traceback.format_exc()
     stdout = redirected_output.getvalue()
@@ -42,14 +41,12 @@ async def eval(client: user, message: user.types.Message):
             user.md.Code(evaluation.strip()))
     ))
     if len(out) > 4096:
-        filename = 'output.txt'
-        with open(filename, 'w+', encoding='utf8') as out_file:
-            out_file.write(str(evaluation.strip()))
+        data = BytesIO(str(evaluation.strip()).encode())
+        data.name = 'output.txt'
         await message.reply_document(
-            document=filename,
+            document=data,
             quote=True
         )
-        os.remove(filename)
     else:
         await message.reply(
             text=out,
