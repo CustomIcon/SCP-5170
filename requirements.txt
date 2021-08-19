@@ -6,6 +6,7 @@ attrs==21.2.0
 chardet==4.0.0
 Faker==8.11.0
 future==0.18.2
+humanize==3.11.0
 idna==3.2
 joblib==1.0.1
 kantex==0.2.0
