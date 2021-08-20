@@ -50,7 +50,7 @@ def _gen(content: str):
 
 
 
-@user.on_message(user.filters.me & user.command("qrGen"))
+@user.on_message(user.sudo & user.command("qrGen"))
 async def _(_, message: user.types.Message):
     if len(message.text.split()) == 1:
         return await message.delete()

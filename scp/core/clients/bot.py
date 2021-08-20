@@ -21,6 +21,7 @@ class Bot(Client):
 
     def command(self, *args):
         return command(*args)
+
         
     filters = filters
     types = types
