@@ -1,7 +1,6 @@
-from scp.utils.strUtils import permParse
 from scp import user, bot
 from scp.utils.selfInfo import info
-from scp.utils.strUtils import name_check, permParse
+from scp.utils.strUtils import name_check, permissionParser
 from pyrogram import errors
 
 
@@ -114,7 +113,7 @@ async def _(_, query: bot.types.InlineQuery):
 @bot.on_callback_query(bot.sudo & bot.filters.regex('^cperm_'))
 async def _(_, query:user.types.CallbackQuery):
     await query.answer(
-        permParse(
+        permissionParser(
             (await user.get_chat(int(query.data.split("_")[1]))).permissions
         ), show_alert=True)
 

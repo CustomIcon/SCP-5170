@@ -1,6 +1,3 @@
-from pyrogram.types import ChatPermissions
-
-
 def name_check(username: str = None):
     if username:
         return '@'+username
@@ -14,7 +11,7 @@ def bool_check(var: bool):
         return "❌"
 
 
-def _text(perms: ChatPermissions):
+def permissionParser(perms):
     text = ''
     text += 'Message: ' + bool_check(perms.can_send_messages) + '\n'
     text += 'Media: ' + bool_check(perms.can_send_media_messages) + '\n'
