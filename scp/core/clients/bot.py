@@ -26,6 +26,7 @@ class Bot(Client):
     types = types
     _config = ConfigParser()
     _config.read('config.ini')
-    sudo = []
+    _sudo = []
     for x in _config.get('scp-5170', 'SudoList').split():
-        sudo.append(int(x))
+        _sudo.append(int(x))
+    sudo = (filters.user(_sudo))

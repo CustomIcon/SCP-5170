@@ -5,7 +5,7 @@ from scp.utils.selfInfo import info
 
 
 @user.on_message(
-    user.filters.me & user.command('scp')
+    user.sudo & user.command('scp')
 )
 async def _(_, message: user.types.Message):
     x = await user.get_inline_bot_results(info['_bot_username'], 'scp')

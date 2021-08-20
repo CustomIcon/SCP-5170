@@ -11,7 +11,7 @@ __DOC__ = str(user.md.KanTeXDocument(
 
 
 @user.on_message(
-    user.filters.me &
+    user.sudo &
     user.command('info'),
 )
 async def _(_, message: user.types.Message):
@@ -123,7 +123,7 @@ def _text(perms):
     return text
 
 
-@bot.on_callback_query(bot.filters.user(user.sudo) & bot.filters.regex('^cperm_'))
+@bot.on_callback_query(bot.sudo & bot.filters.regex('^cperm_'))
 async def _(_, query:user.types.CallbackQuery):
     await query.answer(
         _text(
@@ -131,7 +131,7 @@ async def _(_, query:user.types.CallbackQuery):
         ), show_alert=True)
 
 
-@bot.on_callback_query(bot.filters.user(user.sudo) & bot.filters.regex('^cdesc_'))
+@bot.on_callback_query(bot.sudo & bot.filters.regex('^cdesc_'))
 async def _(_, query:user.types.CallbackQuery):
     chat = await user.get_chat(int(query.data.split("_")[1]))
     await query.answer(

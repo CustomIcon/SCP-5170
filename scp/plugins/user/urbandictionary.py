@@ -12,7 +12,7 @@ def replace_text(text):
     return text.replace('"', "").replace("\\r", "").replace("\\n", "").replace("\\", "")
 
 
-@user.on_message(user.filters.me & user.command("ud"))
+@user.on_message(user.sudo & user.command("ud"))
 async def _(_, message: user.types.Message):
     if len(message.text.split()) == 1:
         return await message.delete()

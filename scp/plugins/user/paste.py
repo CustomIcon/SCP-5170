@@ -10,7 +10,7 @@ __DOC__ = str(user.md.KanTeXDocument(
             user.md.Code('(*prefix)paste {content}')))))
 
 
-@user.on_message(user.filters.me & user.command("paste"))
+@user.on_message(user.sudo & user.command("paste"))
 async def _(_, message: user.types.Message):
     if len(message.command) != 1:
         text = message.text.split(None, 1)[1]

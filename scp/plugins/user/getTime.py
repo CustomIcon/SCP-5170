@@ -11,7 +11,7 @@ __DOC__ = str(user.md.KanTeXDocument(
             user.md.Code('(*prefix)time {country_or_countryCode}')))))
 
 
-@user.on_message(user.filters.me & user.command('time'))
+@user.on_message(user.sudo & user.command('time'))
 async def _(_, message: user.types.Message):
     if len(message.command) == 1:
         return None

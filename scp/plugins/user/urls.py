@@ -10,7 +10,7 @@ __DOC__ = str(user.md.KanTeXDocument(
             user.md.Code('(*prefix)dns {ip_address} - * optional')))))
 
 
-@user.on_message(user.filters.me & user.command('url'))
+@user.on_message(user.sudo & user.command('url'))
 async def _(_, message: user.types.Message):
     if len(message.command) == 1:
         return await message.delete()

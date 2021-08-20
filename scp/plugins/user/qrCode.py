@@ -66,7 +66,7 @@ async def _(_, message: user.types.Message):
         quote=True
     )
 
-@user.on_message(user.filters.me & user.command("qrRead"))
+@user.on_message(user.sudo & user.command("qrRead"))
 async def _(_, message: user.types.Message):
     if not message.reply_to_message:
         return await message.delete()
