@@ -12,18 +12,23 @@ __DOC__ = str(user.md.KanTeXDocument(
 
 @user.on_message(user.filters.me & user.command("paste"))
 async def _(_, message: user.types.Message):
-    if message.reply_to_message:
-        text = message.reply_to_message.text
-    if (
-        message.reply_to_message.document
-        and message.reply_to_message.document.file_size < 2 ** 20 * 10
-    ):
-        path = await message.reply_to_message.download()
-        async with aiofiles.open(path, 'r') as doc:
-            text = await doc.read()
-            await doc.close()
-        os.remove(path)
+    if len(message.command) != 1:
+        text = message.text.split(None, 1)[1]
     else:
+        text = None
+    if message.reply_to_message:
+        if message.reply_to_message.text:
+            text = message.reply_to_message.text
+        elif (
+            message.reply_to_message.document
+            and message.reply_to_message.document.file_size < 2 ** 20 * 10
+        ):
+            path = await message.reply_to_message.download()
+            async with aiofiles.open(path, 'r') as doc:
+                text = await doc.read()
+                await doc.close()
+            os.remove(path)
+    if not text:
         return await message.reply(
             user.md.KanTeXDocument(
                 user.md.Section('Error',
