@@ -24,3 +24,4 @@ TgCrypto==1.2.2
 typing-extensions==3.10.0.0
 ujson==4.1.0
 yarl==1.6.3
+gpytranslate==1.2.0
