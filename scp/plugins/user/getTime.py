@@ -40,13 +40,9 @@ async def genTime(
     for zone in data["zones"]:
         for eachtype in findtype:
             if to_find in zone[eachtype].lower():
-                date_fmt = r"%d-%m-%Y"
-                time_fmt = r"%H:%M:%S"
-                day_fmt = r"%A"
-                gmt_offset = zone["gmtOffset"]
                 timestamp = datetime.datetime.now(
                     datetime.timezone.utc,
-                ) + datetime.timedelta(seconds=gmt_offset)
+                ) + datetime.timedelta(seconds=zone["gmtOffset"])
                 return user.md.KanTeXDocument(
                     user.md.Section('TimeDB Scrapper',
                         user.md.SubSection(zone["countryName"],
@@ -64,15 +60,15 @@ async def genTime(
                             ),
                             user.md.KeyValueItem(
                                 user.md.Bold('current_day'),
-                                user.md.Code(timestamp.strftime(day_fmt))
+                                user.md.Code(timestamp.strftime(r"%A"))
                             ),
                             user.md.KeyValueItem(
                                 user.md.Bold('current_time'),
-                                user.md.Code(timestamp.strftime(time_fmt))
+                                user.md.Code(timestamp.strftime(r"%H:%M:%S"))
                                 ),
                             user.md.KeyValueItem(
                                 user.md.Bold('current_date'),
-                                user.md.Code(timestamp.strftime(date_fmt))
+                                user.md.Code(timestamp.strftime(r"%d-%m-%Y"))
                             ),
                             user.md.KeyValueItem(
                                 user.md.Bold('time_zones'),
