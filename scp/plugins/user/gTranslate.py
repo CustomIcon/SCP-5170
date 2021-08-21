@@ -2,13 +2,14 @@ from gpytranslate import Translator
 from scp import user
 import aiofiles
 import os
+import asyncio
 
 
 __PLUGIN__ = 'translate'
 __DOC__ = str(user.md.KanTeXDocument(
     user.md.Section('Google Translate',
         user.md.SubSection('translate',
-            user.md.Code('(*prefix)tr {language_code}'))),
+            user.md.Code('(*prefix)tr {language_code} {text} - * optional'))),
         user.md.SubSection('text-to-speech',
             user.md.Code('(*prefix)tts {text}'))))
 
@@ -16,10 +17,11 @@ __DOC__ = str(user.md.KanTeXDocument(
 trl = Translator()
 
 
-@user.on_message(user.sudo & user.command('tr'))
+@user.on_message(user.sudo & user.command('tl'))
 async def _(_, message: user.types.Message):
     if message.reply_to_message and (
-        message.reply_to_message.text or message.reply_to_message.caption
+        message.reply_to_message.text
+        or message.reply_to_message.caption
     ):
         if len(message.text.split()) == 1:
             return await message.delete()
@@ -39,12 +41,11 @@ async def _(_, message: user.types.Message):
             return
     else:
         if len(message.text.split()) <= 2:
-            await message.delete()
-            return
+            return await message.delete()
         target = message.text.split(None, 2)[1]
         text = message.text.split(None, 2)[2]
         try:
-            tekstr = await trl(text, targetlang=target)
+            tekstr = await trl.translate(text, targetlang=target)
         except ValueError as err:
             return await message.reply(
                 user.md.KanTeXDocument(
@@ -52,11 +53,14 @@ async def _(_, message: user.types.Message):
                 ),
                 quote=True
             )
+    detect = await trl.detect(text)
     await message.reply(
         user.md.KanTeXDocument(
             user.md.Section('Translator',
                 user.md.SubSection('Translated:',
-                    user.md.Italic(tekstr.text)),)),
+                    user.md.Code(tekstr.text)),
+                user.md.SubSection('Detected language:',
+                    user.md.Code(detect)),)),
         quote=True
     )
 
