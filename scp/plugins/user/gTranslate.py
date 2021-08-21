@@ -2,7 +2,6 @@ from gpytranslate import Translator
 from scp import user
 import aiofiles
 import os
-import asyncio
 
 
 __PLUGIN__ = 'translate'
@@ -17,7 +16,7 @@ __DOC__ = str(user.md.KanTeXDocument(
 trl = Translator()
 
 
-@user.on_message(user.sudo & user.command('tl'))
+@user.on_message(user.sudo & user.command('tr'))
 async def _(_, message: user.types.Message):
     if message.reply_to_message and (
         message.reply_to_message.text
