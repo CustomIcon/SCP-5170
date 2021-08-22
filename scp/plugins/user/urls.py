@@ -21,7 +21,7 @@ async def _(_, message: user.types.Message):
                     user.md.Bold('Original URL'),user.md.Code(link)),
                 user.md.KeyValueItem(
                     user.md.Bold('Followed URL'),
-                    user.md.Code(await user.resolve_url(link, base_domain=False)))))
+                    user.md.Code(await user.resolve_url(link)))))
     await message.reply(text, quote=True)
 
 

@@ -2,12 +2,9 @@ from pyrogram import Client, filters, types, raw
 from scp.core.filters.Command import user_command as command
 from configparser import ConfigParser
 from kantex import md as Markdown
-from aiohttp import ClientSession, ClientTimeout, ClientError
-from faker import Faker
+from aiohttp import ClientSession, ClientTimeout
 import asyncio
-import socket
-from typing import Optional, Any
-from yarl import URL
+from typing import Any
 
 
 class User(Client):
@@ -35,24 +32,13 @@ class User(Client):
         return command(*args)
     
     # from Kantek
-    async def resolve_url(self, url: str, base_domain: bool = True) -> str:
-        faker = Faker()
-        headers = {'User-Agent': faker.user_agent()}
+    async def resolve_url(self, url: str) -> str:
         old_url = url
         if not url.startswith('http'):
             url: str = f'http://{url}'
-        try:
-            async with self.aioclient.get(url, headers=headers) as response:
-                url: URL = response.url
-        except (ClientError, asyncio.TimeoutError, socket.gaierror):
-            return old_url
-
-        if base_domain:
-            url: Optional[str] = url.host
-            _base_domain = url.split('.', maxsplit=url.count('.') - 1)[-1]
-            if _base_domain:
-                url: str = _base_domain
-        return str(url)
+        async with self.aioclient.get(f'http://expandurl.com/api/v1/?url={url}') as response:
+            expanded = await response.text()
+        return expanded if expanded != "false" and expanded[:-1] != url else None
     
     async def getRequest(self, url:str):
         async with self.aioclient.get(url) as resp:
