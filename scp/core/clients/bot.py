@@ -1,6 +1,7 @@
 from pyrogram import Client, filters, types
 from scp.core.filters.Command import bot_command as command
 from configparser import ConfigParser
+from kantex import md as Markdown
 
 
 class Bot(Client):
@@ -25,6 +26,7 @@ class Bot(Client):
         
     filters = filters
     types = types
+    md = Markdown
     _config = ConfigParser()
     _config.read('config.ini')
     _sudo = []

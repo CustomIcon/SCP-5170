@@ -6,7 +6,7 @@ from aiohttp import ClientSession, ClientTimeout, ClientError
 from faker import Faker
 import asyncio
 import socket
-from typing import Optional
+from typing import Optional, Any
 from yarl import URL
 
 
@@ -62,10 +62,15 @@ class User(Client):
     async def postRequest(
         self,
         url:str,
-        json: dict
+        json: dict = None,
+        data: Any = None
     ):
-        async with self.aioclient.post(url, json=json) as resp:
-            return await resp.json()
+        if data:
+            async with self.aioclient.post(url, data=data) as resp:
+                return await resp.json()
+        else:
+            async with self.aioclient.post(url, json=json) as resp:
+                return await resp.json()
     
 
     async def netcat(self, host: str, port: int, content: str):
@@ -90,3 +95,4 @@ class User(Client):
     for x in _config.get('scp-5170', 'SudoList').split():
         _sudo.append(int(x))
     sudo = (filters.me | filters.user(_sudo))
+    log_channel = _config.getint('scp-5170', 'LogChannel')  
