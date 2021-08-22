@@ -10,3 +10,4 @@ pyzxing==1.0.1
 TgCrypto==1.2.2
 ujson==4.1.0
 yarl==1.6.3
+shortuuid==1.0.1
