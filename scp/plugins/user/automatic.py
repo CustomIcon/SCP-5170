@@ -15,11 +15,12 @@ async def _(_, message: user.types.Message):
     """
     a function to log Spam Detection
     """
-    if message.from_user:
-        uid = message.from_user
-    else:
-        uid = message.sender_chat
-    if await is_flood(uid):
+    uid = message.from_user or message.sender_chat
+    if await is_flood(uid) and await user.send(
+        user.raw.functions.messages.ReportSpam(
+            peer=await user.resolve_peer(uid.id)
+        )
+    ):
         return await bot.send_message(
             user.log_channel,
             user.md.KanTeXDocument(
@@ -50,10 +51,7 @@ async def _(_, message: user.types.Message):
     """
     [WIP] a function to log admin calls
     """
-    if message.from_user:
-        uid = message.from_user.id
-    else:
-        uid = message.sender_chat.id
+    uid = message.from_user.id if message.from_user else message.sender_chat.id
     return await bot.send_message(
         user.log_channel,
         user.md.KanTeXDocument(

@@ -7,8 +7,8 @@ import asyncio
 
 
 USERS = defaultdict(list)
-MESSAGES = 4
-SECONDS = 6
+MESSAGES = 7
+SECONDS = 8
 
 
 async def is_flood(
