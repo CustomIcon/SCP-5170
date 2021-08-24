@@ -1,0 +1,3 @@
+[submodule "qrGen"]
+	path = qrGen
+	url = https://github.com/pokurt/qr-Pyrogram-session.git
