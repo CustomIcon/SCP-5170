@@ -20,7 +20,10 @@ def subtract_time(start, end):
 @user.on_message(
     ((user.filters.group & user.filters.mentioned)
     | user.filters.private)
-    & ~user.filters.me & ~user.filters.service, group=3
+    & ~user.filters.me 
+    & ~user.filters.bot
+    & ~user.filters.service,
+    group=3
 )
 async def _(_, message: user.types.Message):
     if AFK:
