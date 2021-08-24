@@ -1,0 +1,9 @@
+[pyrogram]
+api_id = 123456
+api_hash = abcdefghijklmnop
+
+[scp-5170]
+SudoList = 1769494496
+Prefixes = ! .
+LogChannel = -100144441222
+IgnoreGroups = -1001234567
