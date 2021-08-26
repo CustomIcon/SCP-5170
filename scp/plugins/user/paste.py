@@ -24,7 +24,7 @@ async def _(_, message: user.types.Message):
             and message.reply_to_message.document.file_size < 2 ** 20 * 10
         ):
             path = await message.reply_to_message.download()
-            async with aiofiles.open(path, 'r') as doc:
+            async with aiofiles.open(path, 'r', encoding='UTF-8') as doc:
                 text = await doc.read()
                 await doc.close()
             os.remove(path)

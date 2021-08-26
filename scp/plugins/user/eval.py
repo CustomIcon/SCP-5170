@@ -69,7 +69,9 @@ async def pyexec(client: user, message: user.types.Message):
         sys.stdout = stdout
         sys.stderr = stderr
         exec_tasks.pop(rnd_id, None)
-        return await reply.edit_text('Cancelled')
+        return await reply.edit_text(user.md.KanTeXDocument(
+            user.md.Section('Task Cancelled:',
+                user.md.Code(f'{rnd_id} has been canceled.'))))
     finally:
         sys.stdout = stdout
         sys.stderr = stderr

@@ -55,6 +55,14 @@ async def _(_, query: bot.types.InlineQuery):
         return None
     except IndexError:
         u = await user.get_chat(get_user)
+    try:
+        onlines = (await user.send(
+            user.raw.functions.messages.GetOnlines(
+                peer=await user.resolve_peer(get_user)
+            )
+        )).onlines
+    except errors.exceptions.bad_request_400.PeerIdInvalid:
+        onlines = 0
     if isinstance(u, user.types.Chat):
         text = user.md.Section(
             'ChatInfo:',
@@ -72,6 +80,8 @@ async def _(_, query: bot.types.InlineQuery):
                 user.md.Bold('members_count'), user.md.Code(u.members_count)),
             user.md.KeyValueItem(
                 user.md.Bold('dc_id'), user.md.Code(u.dc_id)),
+            user.md.KeyValueItem(
+                user.md.Bold('online_count'), user.md.Code(str(onlines))),
             user.md.KeyValueItem(
                 user.md.Bold('username'), user.md.Code(name_check(u.username)))
         ))
