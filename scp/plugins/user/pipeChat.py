@@ -108,9 +108,14 @@ async def _(_, query: user.types.CallbackQuery):
                 _fromChat.first_name
                 or _fromChat.last_name
                 or _fromChat.title,
-                _fromChat.id,
+                _fromChat.id
             )
-            toChat = (_toChat.first_name or _toChat.id)
+            toChat = (
+                _toChat.first_name
+                or _toChat.last_name
+                or _toChat.title,
+                _toChat.id
+            )
             return await query.edit_message_text(
                 user.md.KanTeXDocument(
                     user.md.Section(
