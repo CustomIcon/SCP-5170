@@ -3,6 +3,23 @@ from scp.utils.selfInfo import info
 from pyrogram import errors
 
 
+__PLUGIN__ = 'pipeChat'
+__DOC__ = str(
+    user.md.KanTeXDocument(
+        user.md.Section(
+            'Forward incoming contents from a chat to another chat',
+            user.md.SubSection(
+                'PipeChat',
+                user.md.Code('(*prefix)pipeChat {fromChat} {toChat}'),
+            ),
+            user.md.SubSection(
+                'list Piped Chats',
+                user.md.Code('(*prefix)listPipes'),
+            ),
+        ),
+    ),
+)
+
 chats = user.filters.chat()
 _chats = {}
 
@@ -14,7 +31,7 @@ async def _(_, message: user.types.Message):
             await user.forward_messages(y, x, message.message_id)
 
 
-@user.on_message(user.sudo & user.command('pipe'))
+@user.on_message(user.sudo & user.command('pipeChat'))
 async def _(_, message: user.types.Message):
     fromChat = int(message.text.split(' ')[1])
     toChat = int(message.text.split(' ')[2])
@@ -47,11 +64,14 @@ async def _(_, message: user.types.Message):
     & user.filters.regex('^pipeList'),
 )
 async def _(_, query: user.types.InlineQuery):
-    buttons = []
-    for x, _ in _chats.items():
-        buttons.append(
-            [user.types.InlineKeyboardButton(x, callback_data=f'pipeCheck_{x}')]
-        )
+    buttons = [
+        [
+            user.types.InlineKeyboardButton(
+                x,
+                callback_data=f'pipeCheck_{x}',
+            ),
+        ] for x, _ in _chats.items()
+    ]
     await query.answer(
         results=[
             user.types.InlineQueryResultArticle(
@@ -70,8 +90,8 @@ async def _(_, query: user.types.InlineQuery):
                 reply_markup=user.types.InlineKeyboardMarkup(buttons),
             ),
         ],
-        cache_time=0
-    ) 
+        cache_time=0,
+    )
 
 
 @bot.on_callback_query(
@@ -80,22 +100,40 @@ async def _(_, query: user.types.InlineQuery):
 )
 async def _(_, query: user.types.CallbackQuery):
     fromChat = int(query.data.split('_')[1])
-    for x, y in _chats.items():  
+    for x, y in _chats.items():
         if x == fromChat:
             _fromChat = (await user.get_chat(x))
             _toChat = (await user.get_chat(y))
-            fromChat = (_fromChat.first_name or _fromChat.last_name or _fromChat.title, _fromChat.id)
+            fromChat = (
+                _fromChat.first_name
+                or _fromChat.last_name
+                or _fromChat.title,
+                _fromChat.id,
+            )
             toChat = (_toChat.first_name or _toChat.id)
             return await query.edit_message_text(
                 user.md.KanTeXDocument(
-                    user.md.Section('PipeChat',
-                    user.md.KeyValueItem('fromChat', str(fromChat)),
-                    user.md.KeyValueItem('toChat', str(toChat)))
+                    user.md.Section(
+                        'PipeChat',
+                        user.md.KeyValueItem(
+                            user.md.Bold('fromChat'),
+                            user.md.Code(str(fromChat)),
+                        ),
+                        user.md.KeyValueItem(
+                            user.md.Bold('toChat'),
+                            user.md.Code(str(toChat)),
+                        ),
+                    ),
                 ),
                 reply_markup=user.types.InlineKeyboardMarkup(
-                    [[user.types.InlineKeyboardButton('removePipe', f'pipeRemove_{x}_{y}')]]
-                )
+                    [[
+                        user.types.InlineKeyboardButton(
+                            'removePipe', f'pipeRemove_{x}_{y}',
+                        ),
+                    ]],
+                ),
             )
+
 
 @bot.on_callback_query(
     user.filters.user(info['_user_id'])
@@ -107,7 +145,11 @@ async def _(_, query: user.types.CallbackQuery):
     chats.remove(fromChat)
     chats.remove(toChat)
     _chats.pop(fromChat)
-    await query.edit_message_text(user.md.KanTeXDocument(
-        user.md.Section('Pipe Removed',
-        user.md.KeyValueItem(fromChat, toChat))
-    ))
+    await query.edit_message_text(
+        user.md.KanTeXDocument(
+            user.md.Section(
+                'Pipe Removed',
+                user.md.KeyValueItem(fromChat, toChat),
+            ),
+        ),
+    )
