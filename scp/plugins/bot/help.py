@@ -15,7 +15,7 @@ async def help_parser(client, chat_id, text, keyboard=None):
     await client.send_message(chat_id, text, reply_markup=keyboard)
 
 
-@bot.on_message((bot.sudo | bot.filters.user(info['_user_id'])) & bot.command('help'))
+@bot.on_message((bot.sudo | bot.filters.user(info['_user_id'])) & bot.command('help', prefixes='/'))
 async def help_command(client, message):
     await help_parser(
         client,

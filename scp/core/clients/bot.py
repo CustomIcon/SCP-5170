@@ -1,5 +1,5 @@
 from pyrogram import Client, filters, types
-from scp.core.filters.Command import bot_command as command
+from scp.core.filters.Command import command
 from configparser import ConfigParser
 from kantex import md as Markdown
 import logging
@@ -21,8 +21,8 @@ class Bot(Client):
         await super().stop()
         logging.warning('`Bot.Client` stopped.')
 
-    def command(self, *args):
-        return command(*args)
+    def command(self, *args, **kwargs):
+        return command(*args, **kwargs)
 
         
     filters = filters

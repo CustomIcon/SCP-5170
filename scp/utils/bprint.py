@@ -12,7 +12,7 @@ def _default_skip_predicate(name: str, value: typing.Any, callable_=callable) ->
 
 def bprint(
         *values: typing.Any,
-        stream: typing.Union[typing.TextIO, typing.Type[str]],
+        stream: typing.Union[typing.TextIO, typing.Type[str]] = None,
         indent: typing.Union[str, typing.Tuple[str]] = '  ',
         start_indent_level: int = 0,
         maximum_depth: int = None,

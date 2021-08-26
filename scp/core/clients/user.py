@@ -1,5 +1,5 @@
 from pyrogram import Client, filters, types, raw
-from scp.core.filters.Command import user_command as command
+from scp.core.filters.Command import command
 from configparser import ConfigParser
 from kantex import md as Markdown
 from aiohttp import ClientSession, ClientTimeout, client_exceptions
@@ -28,8 +28,8 @@ class User(Client):
         await super().stop()
         logging.warning('`Use.Client` started.')
     
-    def command(self, *args):
-        return command(*args)
+    def command(self, *args, **kwargs):
+        return command(*args, **kwargs)
     
     # from Kantek
     async def resolve_url(self, url: str) -> str:

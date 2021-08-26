@@ -1,7 +1,6 @@
 from scp.utils.selfInfo import updateInfo
 import importlib
 from scp import bot, user
-from scp.utils.selfInfo import getBotInfo, getUserInfo
 from scp.plugins.bot import ALL_SETTINGS
 from scp.plugins.user import ALL_MODULES
 import asyncio
