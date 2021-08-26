@@ -15,15 +15,24 @@ async def help_parser(client, chat_id, text, keyboard=None):
     await client.send_message(chat_id, text, reply_markup=keyboard)
 
 
-@bot.on_message((bot.sudo | bot.filters.user(info['_user_id'])) & bot.command('help', prefixes='/'))
+@bot.on_message(
+    (bot.sudo | bot.filters.user(info['_user_id']))
+    & bot.command('help', prefixes='/'),
+)
 async def help_command(client, message):
     await help_parser(
         client,
         message.chat.id,
         user.md.KanTeXDocument(
-            user.md.Section("Help module",
-                user.md.KeyValueItem(user.md.Bold('Prefixes'), user.md.Code(', '.join(prefixes))))
-        )
+            user.md.Section(
+                'Help module',
+                user.md.KeyValueItem(
+                    user.md.Bold(
+                        'Prefixes',
+                    ), user.md.Code(', '.join(prefixes)),
+                ),
+            ),
+        ),
     )
 
 
@@ -65,10 +74,14 @@ async def help_button(_, query):
     elif back_match:
         await query.message.edit(
             text=user.md.KanTeXDocument(
-                    user.md.Section("Help module",
-                        user.md.KeyValueItem(user.md.Bold('Prefixes'),
-                            user.md.Code(' '.join(prefixes))))
+                user.md.Section(
+                    'Help module',
+                    user.md.KeyValueItem(
+                        user.md.Bold('Prefixes'),
+                        user.md.Code(' '.join(prefixes)),
+                    ),
                 ),
+            ),
             reply_markup=InlineKeyboardMarkup(
                 paginate_modules(0, HELP_COMMANDS, 'help'),
             ),

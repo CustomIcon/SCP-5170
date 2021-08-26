@@ -6,9 +6,9 @@ def name_check(username: str = None):
 
 def bool_check(var: bool):
     if var:
-        return "✅"
+        return '✅'
     else:
-        return "❌"
+        return '❌'
 
 
 def permissionParser(perms):

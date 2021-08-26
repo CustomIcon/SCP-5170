@@ -1,11 +1,13 @@
 from scp.utils.selfInfo import info
-from scp import bot, user
+from scp import bot
+
 
 @bot.on_message(
     bot.filters.user(info['_user_id'])
     & bot.command('config', prefixes='/')
-    & bot.filters.private)
-async def _(_, message:bot.types.Message):
+    & bot.filters.private,
+)
+async def _(_, message: bot.types.Message):
     doc = bot.md.KanTeXDocument()
     sec = bot.md.Section('Configurations')
     for x, y in bot._config.__dict__['_sections'].items():
@@ -18,23 +20,36 @@ async def _(_, message:bot.types.Message):
     await message.reply(
         doc,
         reply_markup=bot.types.InlineKeyboardMarkup(
-            [[bot.types.InlineKeyboardButton('Edit Config', callback_data='edit/config')]]
-        )
+            [[
+                bot.types.InlineKeyboardButton(
+                    'Edit Config', callback_data='edit/config',
+                ),
+            ]],
+        ),
     )
 
 
-@bot.on_callback_query(bot.filters.user(info['_user_id']) & bot.filters.regex('^edit/config'))
+@bot.on_callback_query(
+    bot.filters.user(
+        info['_user_id'],
+    )
+    & bot.filters.regex('^edit/config'),
+)
 async def _(_, query: bot.types.CallbackQuery):
-    buttons = []
     if query.data == 'edit/config':
+        buttons = []
         for _, y in bot._config.__dict__['_sections'].items():
             for i in y:
                 buttons.append(
-                    [bot.types.InlineKeyboardButton(i, callback_data=f'edit/config/{i}')]
+                    [
+                        bot.types.InlineKeyboardButton(
+                            i, callback_data=f'edit/config/{i}',
+                        ),
+                    ],
                 )
         return await query.edit_message_text(
             'choose a config key to edit in config.ini',
-            reply_markup=bot.types.InlineKeyboardMarkup(buttons)
+            reply_markup=bot.types.InlineKeyboardMarkup(buttons),
         )
     toEdit = query.data.split('/')[2]
     for x, y in bot._config.__dict__['_sections'].items():
@@ -46,19 +61,29 @@ async def _(_, query: bot.types.CallbackQuery):
                             'EditConfig current key and value',
                             bot.md.KeyValueItem(
                                 bot.md.Bold(i),
-                                bot.md.Code(n)
-                            )
-                        )
-                    )
+                                bot.md.Code(n),
+                            ),
+                        ),
+                    ),
                 )
-                editConfig = await query.from_user.ask(f'send me the value to change in {i}')
+                editConfig = await query.from_user.ask(
+                    f'send me the value to change in {i}',
+                )
                 bot._config.set(x, i, editConfig.text)
                 with open('config.ini', 'w') as configfile:
                     bot._config.write(configfile)
                 return await query.message.reply(
                     bot.md.KanTeXDocument(
-                        bot.md.Section('Success',
-                            bot.md.SubSection('Changes:',
-                                bot.md.KeyValueItem(bot.md.Bold(i), bot.md.Code(editConfig.text))))
-                    )
+                        bot.md.Section(
+                            'Success',
+                            bot.md.SubSection(
+                                'Changes:',
+                                bot.md.KeyValueItem(
+                                    bot.md.Bold(
+                                        i,
+                                    ), bot.md.Code(editConfig.text),
+                                ),
+                            ),
+                        ),
+                    ),
                 )

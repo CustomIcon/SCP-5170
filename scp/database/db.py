@@ -1,9 +1,10 @@
 class Temp:
     unallowed = [int, float]
+
     def __init__(
         self,
         schema=None,
-        data = dict
+        data=dict,
     ):
         self.data = data
         self.schema = schema

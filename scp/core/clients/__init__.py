@@ -1,2 +1,2 @@
-from .bot import Bot
-from .user import User
+from .bot import Bot  # noqa
+from .user import User  # noqa

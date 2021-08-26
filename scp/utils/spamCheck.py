@@ -33,7 +33,7 @@ async def cleaner(
     while not await asyncio.sleep(sleep):
         for user, _ in users.copy().items():
             check = list(
-                filter(lambda x: time() - int(x) < seconds, users[user])
+                filter(lambda x: time() - int(x) < seconds, users[user]),
             )
             if not check:
                 del users[user]

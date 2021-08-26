@@ -4,11 +4,13 @@ from scp.plugins.user import ALL_MODULES
 
 HELP_COMMANDS = {}
 
+
 async def loadBotPlugins():
     for setting in ALL_SETTINGS:
         importlib.import_module(
             'scp.plugins.bot.' + setting,
         )
+
 
 async def loadUserPlugins():
     for modul in ALL_MODULES:

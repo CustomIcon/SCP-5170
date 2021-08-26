@@ -11,15 +11,19 @@ from scp import user, bot
 from pyrogram import errors
 from scp.utils.selfInfo import info
 
-exec_tasks = dict()
+exec_tasks = {}
 
 
 @user.on_message(
     user.filters.me
-    & user.filters.command('eval', prefixes=user._config.get('scp-5170', 'prefixes').split())
+    & user.filters.command(
+        'eval',
+        prefixes=user._config.get('scp-5170', 'prefixes').split(),
+    ),
 )
 async def pyexec(client: user, message: user.types.Message):
     code = message.text.split(None, 1)[1]
+
     class UniqueExecReturnIdentifier:
         pass
     tree = ast.parse(code)
@@ -32,8 +36,11 @@ async def pyexec(client: user, message: user.types.Message):
         if ex.msg != "'return' with value in async generator":
             raise
         exx = _gf(obody)
-    rnd_id = "#" + str(ShortUUID().random(length=5))
-    reply = await message.reply_text(f'Executing <code>{rnd_id}</code>',quote=True)
+    rnd_id = '#' + str(ShortUUID().random(length=5))
+    reply = await message.reply_text(
+        f'Executing <code>{rnd_id}</code>',
+        quote=True,
+    )
     oasync_obj = exx(
         client,
         client,
@@ -42,7 +49,7 @@ async def pyexec(client: user, message: user.types.Message):
         reply,
         message.reply_to_message,
         message.reply_to_message,
-        UniqueExecReturnIdentifier
+        UniqueExecReturnIdentifier,
     )
     if inspect.isasyncgen(oasync_obj):
         async def async_obj():
@@ -50,7 +57,9 @@ async def pyexec(client: user, message: user.types.Message):
     else:
         async def async_obj():
             to_return = [await oasync_obj]
-            return [] if to_return == [UniqueExecReturnIdentifier] else to_return
+            return [] if to_return == [
+                UniqueExecReturnIdentifier,
+            ] else to_return
     stdout = sys.stdout
     stderr = sys.stderr
     wrapped_stdout = StringIO()
@@ -63,15 +72,22 @@ async def pyexec(client: user, message: user.types.Message):
         except Exception as err:
             returned = err
             return await reply.edit_text(
-                user.md.KanTeXDocument(user.md.Section('Error:', user.md.Code(err)))
+                user.md.KanTeXDocument(
+                    user.md.Section('Error:', user.md.Code(err)),
+                ),
             )
     except asyncio.CancelledError:
         sys.stdout = stdout
         sys.stderr = stderr
         exec_tasks.pop(rnd_id, None)
-        return await reply.edit_text(user.md.KanTeXDocument(
-            user.md.Section('Task Cancelled:',
-                user.md.Code(f'{rnd_id} has been canceled.'))))
+        return await reply.edit_text(
+            user.md.KanTeXDocument(
+                user.md.Section(
+                    'Task Cancelled:',
+                    user.md.Code(f'{rnd_id} has been canceled.'),
+                ),
+            ),
+        )
     finally:
         sys.stdout = stdout
         sys.stderr = stderr
@@ -85,61 +101,83 @@ async def pyexec(client: user, message: user.types.Message):
         output += f'<code>{html.escape(str(i).strip())}</code>\n'
     if not output.strip():
         output = 'Success'
-    
+
     if len(output) > 4096:
-        out = wrapped_stdout_text + "\n"
+        out = wrapped_stdout_text + '\n'
         for i in returned:
-            out += str(i).strip() + "\n"
+            out += str(i).strip() + '\n'
         f = BytesIO(out.strip().encode('utf-8'))
-        f.name = "output.txt"
+        f.name = 'output.txt'
         await asyncio.gather(reply.delete(), message.reply_document(f))
     else:
         await reply.edit_text(
             user.md.KanTeXDocument(
-                user.md.Section('Output:', user.md.Code(output))
-            )
+                user.md.Section('Output:', user.md.Code(output)),
+            ),
         )
 
 
 @user.on_message(user.filters.me & user.command('listEval'))
 async def listexec(_, message: user.types.Message):
     try:
-        x = await user.get_inline_bot_results(info['_bot_username'], '_listEval')
+        x = await user.get_inline_bot_results(
+            info['_bot_username'],
+            '_listEval',
+        )
     except (
         errors.exceptions.bad_request_400.PeerIdInvalid,
-        errors.exceptions.bad_request_400.BotResponseTimeout
+        errors.exceptions.bad_request_400.BotResponseTimeout,
     ):
         return await message.reply('no tasks', quote=True)
     for m in x.results:
         await message.reply_inline_bot_result(x.query_id, m.id, quote=True)
 
 
-@bot.on_inline_query(user.filters.user(info['_user_id']) & user.filters.regex('^_listEval'))
+@bot.on_inline_query(
+    user.filters.user(info['_user_id'])
+    & user.filters.regex('^_listEval'),
+)
 async def _(_, query: user.types.InlineQuery):
-    buttons = []
-    buttons.append([user.types.InlineKeyboardButton(text='cancel all', callback_data=f'cancel_eval_all')])
+    buttons = [[
+        user.types.InlineKeyboardButton(
+            text='cancel all',
+            callback_data='cancel_eval_all',
+        ),
+    ]]
     for x, _ in exec_tasks.items():
         buttons.append(
-            [user.types.InlineKeyboardButton(text=x, callback_data=f'cancel_eval_{x}')]
+            [
+                user.types.InlineKeyboardButton(
+                    text=x, callback_data=f'cancel_eval_{x}',
+                ),
+            ],
         )
     await query.answer(
         results=[
             user.types.InlineQueryResultArticle(
-            title='list eval tasks',
-            input_message_content=user.types.InputTextMessageContent(
-                user.md.KanTeXDocument(
-                    user.md.Section('ListEvalTasks',
-                    user.md.KeyValueItem('Tasks Running',
-                    str(len(exec_tasks))))
-                )
+                title='list eval tasks',
+                input_message_content=user.types.InputTextMessageContent(
+                    user.md.KanTeXDocument(
+                        user.md.Section(
+                            'ListEvalTasks',
+                            user.md.KeyValueItem(
+                                'Tasks Running',
+                                str(len(exec_tasks)),
+                            ),
+                        ),
+                    ),
+                ),
+                reply_markup=user.types.InlineKeyboardMarkup(buttons),
             ),
-            reply_markup=user.types.InlineKeyboardMarkup(buttons)
-        )],
-        cache_time=0
+        ],
+        cache_time=0,
     )
 
 
-@bot.on_callback_query(user.filters.user(info['_user_id']) & user.filters.regex('^cancel_'))
+@bot.on_callback_query(
+    user.filters.user(info['_user_id'])
+    & user.filters.regex('^cancel_'),
+)
 async def cancelexec(_, query: user.types.CallbackQuery):
     Type = query.data.split('_')[1]
     taskID = query.data.split('_')[2]
@@ -147,14 +185,19 @@ async def cancelexec(_, query: user.types.CallbackQuery):
         if taskID == 'all':
             for _, i in exec_tasks.items():
                 i.cancel()
-            return await query.edit_message_text(f'All tasks has been cancelled')
+            return await query.edit_message_text(
+                'All tasks has been cancelled',
+            )
         else:
             try:
                 task = exec_tasks.get(taskID)
             except IndexError:
                 return
         if not task:
-            return await query.answer('Task does not exist anymore', show_alert=True)
+            return await query.answer(
+                'Task does not exist anymore',
+                show_alert=True,
+            )
         task.cancel()
         return await query.edit_message_text(f'{taskID} has been cancelled')
 
@@ -166,7 +209,7 @@ def _gf(body):
             [],
             [
                 ast.arg(
-                    i, None, None
+                    i, None, None,
                 ) for i in [
                     'c',
                     'client',
@@ -175,19 +218,19 @@ def _gf(body):
                     'executing',
                     'r',
                     'reply',
-                    '_ueri'
+                    '_ueri',
                 ]
             ],
             None,
             [],
             [],
             None,
-            []
+            [],
         ),
         body,
         [],
         None,
-        None
+        None,
     )
     ast.fix_missing_locations(func)
     mod = ast.parse('')

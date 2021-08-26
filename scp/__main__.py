@@ -19,7 +19,7 @@ async def start_bot():
     await asyncio.gather(
         loadBotPlugins(),
         loadUserPlugins(),
-        idle()
+        idle(),
     )
 
 

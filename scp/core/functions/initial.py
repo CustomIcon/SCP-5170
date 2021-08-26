@@ -16,7 +16,7 @@ async def reinitial():
         bot.start(),
         updateInfo(),
         user.stop(),
-        bot.stop()
+        bot.stop(),
     )
 
 
@@ -25,7 +25,6 @@ async def reload_userbot():
     for modul in ALL_MODULES:
         imported_module = importlib.import_module('scp.plugins.user.' + modul)
         importlib.reload(imported_module)
-
 
 
 async def restart_all():
@@ -37,7 +36,7 @@ async def reboot():
     global BOT_RUNTIME, HELP_COMMANDS
     importlib.reload(importlib.import_module('scp.plugins.user'))
     importlib.reload(importlib.import_module('scp.plugins.bot'))
-    await asyncio.gather(bot.restart(),user.restart(),reinitial_restart())
+    await asyncio.gather(bot.restart(), user.restart(), reinitial_restart())
     BOT_RUNTIME = 0
     HELP_COMMANDS = {}
     # Assistant bot

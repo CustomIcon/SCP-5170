@@ -24,7 +24,6 @@ class Bot(Client):
     def command(self, *args, **kwargs):
         return command(*args, **kwargs)
 
-        
     filters = filters
     types = types
     md = Markdown

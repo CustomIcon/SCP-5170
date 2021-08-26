@@ -6,7 +6,11 @@ import typing
 DEFAULT_STREAM = sys.stdout
 
 
-def _default_skip_predicate(name: str, value: typing.Any, callable_=callable) -> bool:
+def _default_skip_predicate(
+    name: str,
+    value: typing.Any,
+    callable_=callable,
+) -> bool:
     return name.startswith('_') or value is None or callable_(value)
 
 
@@ -21,11 +25,15 @@ def bprint(
         max_bytes_len=64,
         truncate_suffix='…',
         human_bytes=True,
-        skip_predicate: typing.Callable[[str, typing.Any], bool] = _default_skip_predicate,
+        skip_predicate: typing.Callable[
+            [
+                str, typing.Any,
+            ], bool,
+        ] = _default_skip_predicate,
         seq_bullet='- ',
         sep='\n\n',
-        inline_singular=False
-):
+        inline_singular=False,
+):  # sourcery no-metrics
     """
     Beautifully prints the given ``values``.
     Arguments
@@ -111,7 +119,10 @@ def bprint(
             try:
                 return key.decode('utf-8')
             except UnicodeDecodeError:
-                return '<{} byte{}>'.format(len_(key), '' if len_(key) == 1 else 's')
+                return '<{} byte{}>'.format(
+                    len_(key),
+                    '' if len_(key) == 1 else 's',
+                )
         else:
             return key.__name__
 
@@ -152,7 +163,7 @@ def bprint(
             else:
                 return indent[0] + (indent[1] * (level - 2)) + indent[-1]
 
-    def fmt(obj, level, space=''):
+    def fmt(obj, level, space=''):  # sourcery no-metrics
         """
         Pretty formats the given object as a YAML string which is returned.
         (based on TLObject.pretty_format)
@@ -167,7 +178,7 @@ def bprint(
 
         elif is_(obj, float_):
             out.write(space)
-            out.write('{:.2f}'.format(obj))
+            out.write(f'{obj:.2f}')
 
         elif is_(obj, datetime_):
             out.write(space)
@@ -192,15 +203,17 @@ def bprint(
 
                 out.write(value[1])
             else:
-                out.write('<…>' if len_(obj) > max_bytes_len else
-                          ' '.join(f'{b:02X}' for b in obj))
+                out.write(
+                    '<…>' if len_(obj) > max_bytes_len else
+                    ' '.join(f'{b:02X}' for b in obj),
+                )
 
         elif is_(obj, range_):
             out.write(space)
             if obj.start:
                 out.write(str_(range))
             else:
-                out.write('range({})'.format(obj.stop))
+                out.write(f'range({obj.stop})')
 
         elif id_(obj) in seen:
             out.write(space)
@@ -248,7 +261,10 @@ def bprint(
             out.write(obj.__class__.__name__)
             if level < maximum_depth:
                 out.write(':')
-                handle_kvp(level + 1, ((name, getattr_(obj, name)) for name in dir_(obj)))
+                handle_kvp(
+                    level + 1, ((name, getattr_(obj, name))
+                                for name in dir_(obj)),
+                )
 
     for val in values:
         fmt(val, level=start_indent_level)

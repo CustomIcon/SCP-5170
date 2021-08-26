@@ -3,7 +3,7 @@ import sys
 import time
 from .core.clients import Bot, User
 from rich.logging import RichHandler
-from pyromod import listen
+from pyromod import listen  # noqa
 
 RUNTIME = time.time()
 
@@ -22,7 +22,7 @@ logging.basicConfig(
     level=logging.INFO,
     format=LOG_FORMAT,
     datefmt='%m-%d %H:%M',
-    handlers=[RichHandler()]
+    handlers=[RichHandler()],
 )
 console = logging.StreamHandler()
 console.setLevel(logging.ERROR)
