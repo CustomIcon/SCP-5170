@@ -18,7 +18,7 @@ from scp import user
 )
 async def shell(_, message: user.types.Message):
     command = message.text.split(None, 1)[1]
-    reply = await message.reply_text('Executing...')
+    reply = await message.reply_text('Executing...', quote=True)
     process = await asyncio.create_subprocess_shell(
         command,
         stdin=asyncio.subprocess.PIPE,
@@ -45,4 +45,4 @@ async def shell(_, message: user.types.Message):
             )
         )
     else:
-        await reply.edit_text(doc, quote=True)
+        await reply.edit_text(doc)
