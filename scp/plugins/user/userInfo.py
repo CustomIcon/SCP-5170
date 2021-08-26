@@ -94,7 +94,11 @@ async def _(_, query: bot.types.InlineQuery):
             user.md.KeyValueItem(user.md.Bold('dc_id'), user.md.Code(u.dc_id))
         ))
         keyboard = user.types.InlineKeyboardMarkup(
-            [[user.types.InlineKeyboardButton('UserLink', url=f'tg://user?id={u.id}'), user.types.InlineKeyboardButton('Description', callback_data=f'cdesc_{u.id}')]]
+            [[user.types.InlineKeyboardButton(
+                'UserLink',
+                url=f'tg://user?id={u.id}'),
+                user.types.InlineKeyboardButton('Description', callback_data=f'cdesc_{u.id}')
+            ]]
         )
     answers.append(
         user.types.InlineQueryResultArticle(
@@ -110,7 +114,7 @@ async def _(_, query: bot.types.InlineQuery):
     )
 
 
-@bot.on_callback_query(bot.sudo & bot.filters.regex('^cperm_'))
+@bot.on_callback_query((bot.sudo | bot.filters.user(info['_user_id'])) & bot.filters.regex('^cperm_'))
 async def _(_, query:user.types.CallbackQuery):
     await query.answer(
         permissionParser(
@@ -118,7 +122,7 @@ async def _(_, query:user.types.CallbackQuery):
         ), show_alert=True)
 
 
-@bot.on_callback_query(bot.sudo & bot.filters.regex('^cdesc_'))
+@bot.on_callback_query((bot.sudo | bot.filters.user(info['_user_id'])) & bot.filters.regex('^cdesc_'))
 async def _(_, query:user.types.CallbackQuery):
     chat = await user.get_chat(int(query.data.split("_")[1]))
     await query.answer(

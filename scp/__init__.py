@@ -1,8 +1,9 @@
 import logging
-import os
 import sys
 import time
 from .core.clients import Bot, User
+from rich.logging import RichHandler
+from pyromod import listen
 
 RUNTIME = time.time()
 
@@ -13,19 +14,15 @@ if sys.version_info[0] < 3 or sys.version_info[1] < 8:
     sys.exit()
 
 
-if os.path.exists('scp/logs/logs.txt'):
-    with open('scp/logs/logs.txt', 'a') as f:
-        f.write('PEEK OF LOG FILE')
 LOG_FORMAT = (
     '%(filename)s:%(lineno)s %(levelname)s: %(message)s'
 )
 
 logging.basicConfig(
-    level=logging.ERROR,
+    level=logging.INFO,
     format=LOG_FORMAT,
     datefmt='%m-%d %H:%M',
-    filename='scp/logs/logs.txt',
-    filemode='w',
+    handlers=[RichHandler()]
 )
 console = logging.StreamHandler()
 console.setLevel(logging.ERROR)

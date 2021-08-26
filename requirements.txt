@@ -11,3 +11,5 @@ TgCrypto==1.2.2
 ujson==4.1.0
 yarl==1.6.3
 shortuuid==1.0.1
+rich==10.7.0
+pyromod==1.5

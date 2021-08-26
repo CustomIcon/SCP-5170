@@ -7,7 +7,9 @@ import inspect
 import asyncio
 from shortuuid import ShortUUID
 from io import StringIO, BytesIO
-from scp import user
+from scp import user, bot
+from pyrogram import errors
+from scp.utils.selfInfo import info
 
 exec_tasks = dict()
 
@@ -97,27 +99,62 @@ async def pyexec(client: user, message: user.types.Message):
         )
 
 
-@user.on_message(user.filters.me & user.command('listTask'))
+@user.on_message(user.filters.me & user.command('listEval'))
 async def listexec(_, message: user.types.Message):
-    text = '\n'.join(map(str, exec_tasks))
-    if len(text) > 4096:
-        f = BytesIO(text.encode('utf-8'))
-        f.name = 'exectasks.txt'
-        await message.reply_document(f)
-    else:
-        text = '\n'.join(map(lambda i: f'- <code>{i}</code>', exec_tasks))
-        await message.reply_text(text or 'No tasks', quote=True)
-
-
-@user.on_message(user.filters.me & user.command('cancelTask'))
-async def cancelexec(_, message: user.types.Message):
     try:
-        task = exec_tasks.get(message.command[1])
-    except IndexError:
-        return
-    if not task:
-        return await message.reply_text('Task does not exist', quote=True)
-    task.cancel()
+        x = await user.get_inline_bot_results(info['_bot_username'], '_listEval')
+    except (
+        errors.exceptions.bad_request_400.PeerIdInvalid,
+        errors.exceptions.bad_request_400.BotResponseTimeout
+    ):
+        return await message.reply('no tasks', quote=True)
+    for m in x.results:
+        await message.reply_inline_bot_result(x.query_id, m.id, quote=True)
+
+
+@bot.on_inline_query(user.filters.user(info['_user_id']) & user.filters.regex('^_listEval'))
+async def _(_, query: user.types.InlineQuery):
+    buttons = []
+    buttons.append([user.types.InlineKeyboardButton(text='cancel all', callback_data=f'cancel_eval_all')])
+    for x, _ in exec_tasks.items():
+        buttons.append(
+            [user.types.InlineKeyboardButton(text=x, callback_data=f'cancel_eval_{x}')]
+        )
+    await query.answer(
+        results=[
+            user.types.InlineQueryResultArticle(
+            title='list eval tasks',
+            input_message_content=user.types.InputTextMessageContent(
+                user.md.KanTeXDocument(
+                    user.md.Section('ListEvalTasks',
+                    user.md.KeyValueItem('Tasks Running',
+                    str(len(exec_tasks))))
+                )
+            ),
+            reply_markup=user.types.InlineKeyboardMarkup(buttons)
+        )],
+        cache_time=0
+    )
+
+
+@bot.on_callback_query(user.filters.user(info['_user_id']) & user.filters.regex('^cancel_'))
+async def cancelexec(_, query: user.types.CallbackQuery):
+    Type = query.data.split('_')[1]
+    taskID = query.data.split('_')[2]
+    if Type == 'eval':
+        if taskID == 'all':
+            for _, i in exec_tasks.items():
+                i.cancel()
+            return await query.edit_message_text(f'All tasks has been cancelled')
+        else:
+            try:
+                task = exec_tasks.get(taskID)
+            except IndexError:
+                return
+        if not task:
+            return await query.answer('Task does not exist anymore', show_alert=True)
+        task.cancel()
+        return await query.edit_message_text(f'{taskID} has been cancelled')
 
 
 def _gf(body):

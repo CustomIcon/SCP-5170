@@ -2,6 +2,7 @@ from pyrogram import Client, filters, types
 from scp.core.filters.Command import bot_command as command
 from configparser import ConfigParser
 from kantex import md as Markdown
+import logging
 
 
 class Bot(Client):
@@ -14,11 +15,11 @@ class Bot(Client):
 
     async def start(self):
         await super().start()
-        print('bot started. Hi.')
+        logging.warning('`Bot.Client` started.')
 
     async def stop(self, *args):
         await super().stop()
-        print('bot stopped. Bye.')
+        logging.warning('`Bot.Client` stopped.')
 
     def command(self, *args):
         return command(*args)
