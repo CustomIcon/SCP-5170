@@ -1,4 +1,4 @@
-from scp import bot, user, __version__
+from scp import bot, user, __version__, __longVersion__
 from scp.utils.selfInfo import info
 
 
@@ -19,7 +19,13 @@ async def _(_, message: bot.types.Message):
                 user.md.Bold('Userbot Status'), user.md.Code(userbot_stat),
             ),
             user.md.KeyValueItem(
-                user.md.Bold('Version'), user.md.Code(__version__),
+                user.md.Bold('Version'),
+                user.md.Link(
+                    __version__,
+                    'https://github.com/pokurt/SCP-5170/commit/{}'.format(
+                        __longVersion__,
+                    ),
+                ),
             ),
         ),
     )
@@ -32,4 +38,5 @@ async def _(_, message: bot.types.Message):
                 ),
             ]],
         ),
+        disable_web_page_preview=True,
     )

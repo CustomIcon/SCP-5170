@@ -22,7 +22,7 @@ async def _(_, message: user.types.Message):
     resp = await user.getRequest(
         'https://phonevalidation.abstractapi.com/v1/'
         '?api_key=9d5acbb007c74165b9702ec4a7246e81&'
-        f'phone={message.text.split(None, 1)[1]}'
+        f'phone={message.text.split(None, 1)[1]}',
     )
     doc = user.md.KanTeXDocument()
     sec = user.md.Section('PhoneValidation:')
@@ -31,7 +31,7 @@ async def _(_, message: user.types.Message):
             subsec = user.md.SubSection(x)
             for i, n in y.items():
                 subsec.append(
-                    user.md.KeyValueItem(user.md.Bold(i), user.md.Code(n))
+                    user.md.KeyValueItem(user.md.Bold(i), user.md.Code(n)),
                 )
             sec.append(subsec)
         else:

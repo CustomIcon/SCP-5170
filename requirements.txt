@@ -2,6 +2,7 @@ aiofiles==0.7.0
 aiohttp==3.7.4.post0
 attrify==3.0
 Faker==8.11.0
+GitPython==3.1.18
 gpytranslate==1.3.0
 humanize==3.11.0
 kantex==0.2.0

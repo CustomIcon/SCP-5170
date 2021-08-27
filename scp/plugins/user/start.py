@@ -1,4 +1,4 @@
-from scp import user, __version__, bot, RUNTIME
+from scp import user, __version__, bot, RUNTIME, __longVersion__
 import time
 from scp.utils.parser import get_readable_time
 from scp.utils.selfInfo import info
@@ -34,7 +34,14 @@ async def _(_, query: bot.types.InlineQuery):
         user.md.Section(
             'SCP-5170',
             user.md.SubSection(
-                f'version: {__version__}',
+                'version: {}'.format(
+                    user.md.Link(
+                        __version__,
+                        'https://github.com/pokurt/SCP-5170/commit/{}'.format(
+                            __longVersion__,
+                        ),
+                    ),
+                ),
                 user.md.KeyValueItem(
                     user.md.Bold('dc_id'),
                     user.md.Code(await user.storage.dc_id()),
@@ -63,7 +70,10 @@ async def _(_, query: bot.types.InlineQuery):
             bot.types.InlineQueryResultArticle(
                 title='SCP-5170',
                 description=__version__,
-                input_message_content=bot.types.InputTextMessageContent(text),
+                input_message_content=bot.types.InputTextMessageContent(
+                    text,
+                    disable_web_page_preview=True,
+                ),
                 reply_markup=bot.types.InlineKeyboardMarkup(
                     [[
                         bot.types.InlineKeyboardButton(
