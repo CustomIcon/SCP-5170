@@ -23,7 +23,7 @@ async def shell(_, message: user.types.Message):
         command,
         stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.STDOUT
+        stderr=asyncio.subprocess.STDOUT,
     )
     stdout, _ = await process.communicate()
     returncode = process.returncode
@@ -35,14 +35,14 @@ async def shell(_, message: user.types.Message):
     doc.append(sec)
     if len(str(doc)) > 4096:
         f = BytesIO(stdout.encode('utf-8'))
-        f.name = "output.txt"
+        f.name = 'output.txt'
         await asyncio.gather(
             reply.delete(),
             message.reply_document(
                 f,
                 caption=user.md.KanTeXDocument(sec),
-                quote=True
-            )
+                quote=True,
+            ),
         )
     else:
         await reply.edit_text(doc)

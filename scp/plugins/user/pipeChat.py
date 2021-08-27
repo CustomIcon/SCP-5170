@@ -38,7 +38,6 @@ async def _(_, message: user.types.Message):
     chats.add(fromChat)
     chats.add(toChat)
     _chats[fromChat] = toChat
-    print(chats)
 
 
 @user.on_message(user.sudo & user.command('listPipes'))
@@ -64,6 +63,8 @@ async def _(_, message: user.types.Message):
     & user.filters.regex('^pipeList'),
 )
 async def _(_, query: user.types.InlineQuery):
+    if len(_chats) == 0:
+        return
     buttons = [
         [
             user.types.InlineKeyboardButton(
@@ -108,13 +109,13 @@ async def _(_, query: user.types.CallbackQuery):
                 _fromChat.first_name
                 or _fromChat.last_name
                 or _fromChat.title,
-                _fromChat.id
+                _fromChat.id,
             )
             toChat = (
                 _toChat.first_name
                 or _toChat.last_name
                 or _toChat.title,
-                _toChat.id
+                _toChat.id,
             )
             return await query.edit_message_text(
                 user.md.KanTeXDocument(
