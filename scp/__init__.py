@@ -1,4 +1,5 @@
 import logging
+import asyncio
 import sys
 import time
 from .core.clients import Bot, User
@@ -33,6 +34,7 @@ console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
 
 log = logging.getLogger()
+loop = asyncio.get_event_loop()
 
 bot = Bot()
 user = User()

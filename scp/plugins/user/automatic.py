@@ -1,5 +1,6 @@
 from scp import user, bot
 from scp.utils.spamCheck import is_flood, cleaner
+from scp.utils.selfInfo import info
 import asyncio
 
 
@@ -56,10 +57,29 @@ async def _(_, message: user.types.Message):
         )
 
 
+def _parseReport(report: str):
+    tmp = {
+        'abuse': user.raw.types.InputReportReasonChildAbuse(),
+        'copyright': user.raw.types.InputReportReasonCopyright(),
+        'fake': user.raw.types.InputReportReasonFake(),
+        'porn': user.raw.types.InputReportReasonPornography(),
+        'spam': user.raw.types.InputReportReasonSpam(),
+        'violance': user.raw.types.InputReportReasonViolence(),
+    }
+    try:
+        return tmp[report]
+    except KeyError:
+        return tmp['spam']
+
+
 @user.on_message(
     user.filters.group
     & user.filters.reply
-    & (user.filters.regex(r'@(a|A)dmins') | user.command('report')),
+    & (
+        user.filters.regex(r'@(A|a)dmins')
+        | user.command('report', prefixes='/')
+    ),
+    group=9,
 )
 async def _(_, message: user.types.Message):
     """
@@ -67,6 +87,8 @@ async def _(_, message: user.types.Message):
     """
     uid = message.from_user.id if message.from_user else message.sender_chat.id
     url = message.reply_to_message.link
+    msg = message.reply_to_message.message_id
+    cht = message.chat.id
     return await bot.send_message(
         user.log_channel,
         user.md.KanTeXDocument(
@@ -93,10 +115,74 @@ async def _(_, message: user.types.Message):
             ),
         ),
         reply_markup=user.types.InlineKeyboardMarkup(
+            [
+                [
+                    user.types.InlineKeyboardButton(
+                        'message.link',
+                        url=url,
+                    ),
+                ],
+                [
+                    user.types.InlineKeyboardButton(
+                        'Abuse',
+                        callback_data=f'report_{cht}_{msg}_abuse',
+                    ),
+                    user.types.InlineKeyboardButton(
+                        'Copyright',
+                        callback_data=f'report_{cht}_{msg}_copyright',
+                    ),
+                ],
+                [
+                    user.types.InlineKeyboardButton(
+                        'Fake',
+                        callback_data=f'report_{cht}_{msg}_fake',
+                    ),
+                    user.types.InlineKeyboardButton(
+                        'Porn',
+                        callback_data=f'report_{cht}_{msg}_porn',
+                    ),
+                ],
+                [
+                    user.types.InlineKeyboardButton(
+                        'Spam',
+                        callback_data=f'report_{cht}_{msg}_spam',
+                    ),
+                    user.types.InlineKeyboardButton(
+                        'Violance',
+                        callback_data=f'report_{cht}_{msg}_violance',
+                    ),
+                ],
+            ],
+        ),
+    )
+
+
+@bot.on_callback_query(
+    (bot.sudo | bot.filters.user(info['_user_id']))
+    & bot.filters.regex('^report_'),
+)
+async def _(_, query: user.types.CallbackQuery):
+    data = query.data.split('_')
+    uid = data[1]
+    message_id = data[2]
+    reason = data[3]
+    await user.send(
+        user.raw.functions.messages.Report(
+            peer=await user.resolve_peer(int(uid)),
+            id=[int(message_id)],
+            reason=_parseReport(reason),
+            message=reason,
+        ),
+    )
+    await query.edit_message_reply_markup(
+        reply_markup=user.types.InlineKeyboardMarkup(
             [[
                 user.types.InlineKeyboardButton(
                     'message.link',
-                    url=url,
+                    url='https://t.me/c/{}/{}'.format(
+                        uid.replace('-100', ''),
+                        message_id,
+                    ),
                 ),
             ]],
         ),

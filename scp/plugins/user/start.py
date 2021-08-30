@@ -2,6 +2,7 @@ from scp import user, __version__, bot, RUNTIME, __longVersion__
 import time
 from scp.utils.parser import get_readable_time
 from scp.utils.selfInfo import info
+from scp.utils.unpack import unpackInlineMessage
 
 
 @user.on_message(
@@ -79,9 +80,24 @@ async def _(_, query: bot.types.InlineQuery):
                         bot.types.InlineKeyboardButton(
                             'Source', url='https://github.com/pokurt/SCP-5170',
                         ),
+                        bot.types.InlineKeyboardButton(
+                            'close', callback_data='close_message',
+                        ),
                     ]],
                 ),
             ),
         ],
         cache_time=0,
+    )
+
+
+@bot.on_callback_query(
+    (bot.sudo | bot.filters.user(info['_user_id']))
+    & bot.filters.regex('^close_message'),
+)
+async def _(_, query: user.types.CallbackQuery):
+    unPacked = unpackInlineMessage(query.inline_message_id)
+    await user.delete_messages(
+        chat_id=unPacked.chat_id,
+        message_ids=unPacked.message_id,
     )
