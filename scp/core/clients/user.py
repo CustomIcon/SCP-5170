@@ -2,7 +2,7 @@ from pyrogram import Client, filters, types, raw
 from scp.core.filters.Command import command
 from configparser import ConfigParser
 from kantex import md as Markdown
-from aiohttp import ClientSession, ClientTimeout, client_exceptions
+from aiohttp import ClientSession, client_exceptions
 import asyncio
 import logging
 
@@ -18,7 +18,7 @@ class User(Client):
             name,
             workers=8,
         )
-        self.aioclient = aioclient(timeout=ClientTimeout(total=2))
+        self.aioclient = aioclient()
 
     async def start(self):
         await super().start()
@@ -54,6 +54,17 @@ class User(Client):
         **kwargs
     ):
         async with self.aioclient.post(*args, **kwargs) as resp:
+            try:
+                return await resp.json()
+            except client_exceptions.ContentTypeError:
+                return (await resp.read()).decode('utf-8')
+
+    async def putRequest(
+        self,
+        *args,
+        **kwargs
+    ):
+        async with self.aioclient.put(*args, **kwargs) as resp:
             try:
                 return await resp.json()
             except client_exceptions.ContentTypeError:

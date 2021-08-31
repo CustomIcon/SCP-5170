@@ -25,7 +25,6 @@ def subtract_time(start, end):
     & ~user.filters.me
     & ~user.filters.bot
     & ~user.filters.service,
-    group=3,
 )
 async def _(_, message: user.types.Message):
     if not AFK:

@@ -21,3 +21,18 @@ def get_readable_time(seconds: int) -> str:
     time_list.reverse()
     ping_time += ':'.join(time_list)
     return ping_time
+
+
+def getMediaAttr(o: object):
+    AttrList = [
+        'photo',
+        'video',
+        'animation',
+        'document',
+        'sticker',
+        'voice',
+    ]
+    for a in AttrList:
+        attr = getattr(o, a)
+        if attr:
+            return attr

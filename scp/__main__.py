@@ -1,7 +1,11 @@
 import asyncio
 from pyrogram import idle
 from scp import user, bot
-from scp.core.functions.plugins import loadUserPlugins, loadBotPlugins
+from scp.core.functions.plugins import (
+    loadUserPlugins,
+    loadBotPlugins,
+    loadPrivatePlugins,
+)
 from scp.utils.selfInfo import updateInfo
 from scp.utils.interpreter import shell
 
@@ -19,6 +23,7 @@ async def start_bot():
     await asyncio.gather(
         loadBotPlugins(),
         loadUserPlugins(),
+        loadPrivatePlugins(),
         idle(),
     )
 

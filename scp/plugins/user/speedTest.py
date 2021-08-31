@@ -1,4 +1,3 @@
-from email.utils import quote
 from scp import user
 from scp.utils.SpeedTest import Speedtest
 
@@ -25,15 +24,24 @@ async def _(_, message: user.types.Message):
     await s.download()
     await s.upload()
     text = user.md.KanTeXDocument(
-        user.md.Section('speedTest',
-            user.md.SubSection('Ping:',
-                user.md.Code(str(s.results.ping) + 'ms')),
-            user.md.SubSection('Download:',
+        user.md.Section(
+            'speedTest',
+            user.md.SubSection(
+                'Ping:',
+                user.md.Code(str(s.results.ping) + 'ms'),
+            ),
+            user.md.SubSection(
+                'Download:',
                 user.md.Code(
-                    str(round(s.results.download/1000.0/1000.0, 2)) + 'Mbit/s')
+                    str(round(s.results.download/1000.0/1000.0, 2)) + 'Mbit/s',
                 ),
-            user.md.SubSection('Upload:',
-                user.md.Code(str(round(s.results.upload/1000.0 /1000.0, 2)) + 'Mbit/s')),
-            )
+            ),
+            user.md.SubSection(
+                'Upload:',
+                user.md.Code(
+                    str(round(s.results.upload/1000.0 / 1000.0, 2)) + 'Mbit/s',
+                ),
+            ),
+        ),
     )
     return await reply.edit(text)

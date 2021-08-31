@@ -76,10 +76,9 @@ def _parseReport(report: str):
     user.filters.group
     & user.filters.reply
     & (
-        user.filters.regex(r'@(A|a)dmins')
+        user.filters.regex(r'^@(A|a)dmin')
         | user.command('report', prefixes='/')
     ),
-    group=9,
 )
 async def _(_, message: user.types.Message):
     """

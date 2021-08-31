@@ -1,4 +1,18 @@
 # https://github.com/sivel/speedtest-cli but async
+from io import TextIOWrapper, FileIO
+import builtins
+from io import StringIO, BytesIO
+from hashlib import md5
+from urllib.parse import parse_qs
+from urllib.parse import urlparse
+from http.client import HTTPConnection, BadStatusLine, HTTPSConnection
+from urllib.request import (
+    urlopen, Request, HTTPError, URLError,
+    AbstractHTTPHandler, ProxyHandler,
+    HTTPDefaultErrorHandler, HTTPRedirectHandler,
+    HTTPErrorProcessor, OpenerDirector,
+)
+import ujson as json
 import os
 import re
 import csv
@@ -21,7 +35,6 @@ PY25PLUS = sys.version_info[:2] >= (2, 5)
 PY26PLUS = sys.version_info[:2] >= (2, 6)
 PY32PLUS = sys.version_info[:2] >= (3, 2)
 logger = logging.getLogger()
-import ujson as json
 try:
     import xml.etree.ElementTree as ET
     try:
@@ -33,42 +46,29 @@ except ImportError:
     from xml.parsers.expat import ExpatError
     ET = None
 
-from urllib.request import (
-    urlopen, Request, HTTPError, URLError,
-    AbstractHTTPHandler, ProxyHandler,
-                                HTTPDefaultErrorHandler, HTTPRedirectHandler,
-                                HTTPErrorProcessor, OpenerDirector)
 
-from http.client import HTTPConnection, BadStatusLine, HTTPSConnection
-from http.client import HTTPSConnection
-from urllib.parse import urlparse
-from urllib.parse import parse_qs
-from hashlib import md5
 PARSER_TYPE_INT = int
 PARSER_TYPE_STR = str
 PARSER_TYPE_FLOAT = float
-
-from io import StringIO, BytesIO
-
-import builtins
-from io import TextIOWrapper, FileIO
 
 
 class _Py3Utf8Output(TextIOWrapper):
     """UTF-8 encoded wrapper around stdout for py3, to override
     ASCII stdout
     """
+
     def __init__(self, f, **kwargs):
         buf = FileIO(f.fileno(), 'w')
-        super(_Py3Utf8Output, self).__init__(
+        super().__init__(
             buf,
             encoding='utf8',
-            errors='strict'
+            errors='strict',
         )
 
     def write(self, s):
-        super(_Py3Utf8Output, self).write(s)
+        super().write(s)
         self.flush()
+
 
 _py3_print = getattr(builtins, 'print')
 try:
@@ -80,9 +80,11 @@ except OSError:
     _py3_utf8_stdout = sys.stdout
     _py3_utf8_stderr = sys.stderr
 
+
 def to_utf8(v):
     """No-op encode to utf-8 for py3"""
     return v
+
 
 def print_(*args, **kwargs):
     """Wrapper function for py3 to print, with a utf-8 encoded stdout"""
@@ -110,7 +112,7 @@ try:
     try:
         CERT_ERROR = (ssl.CertificateError,)
     except AttributeError:
-        CERT_ERROR = tuple()
+        CERT_ERROR = ()
 
     HTTP_ERRORS = (
         (HTTPError, URLError, socket.error, ssl.SSLError, BadStatusLine) +
@@ -190,13 +192,14 @@ class SpeedtestBestServerFailure(SpeedtestException):
 class SpeedtestMissingBestServer(SpeedtestException):
     """get_best_server not called or not able to determine best server"""
 
+
 def debug(to_write: str, isdebug: bool = False) -> logger:
     if isdebug:
         print(to_write)
     logger.debug('%s' % to_write)
 
 
-class aiobject(object):
+class aiobject:
     """Inheriting this class allows you to define an async __init__.
     So you can create objects by doing something like `await MyClass(params)`
     """
@@ -209,8 +212,10 @@ class aiobject(object):
         pass
 
 
-async def aio_create_connection(address: Tuple[str, int], timeout: int = _GLOBAL_DEFAULT_TIMEOUT,
-                      source_address: str = None, loop: asyncio.get_event_loop = None) -> socket.socket:
+async def aio_create_connection(
+    address: Tuple[str, int], timeout: int = _GLOBAL_DEFAULT_TIMEOUT,
+    source_address: str = None, loop: asyncio.get_event_loop = None
+) -> socket.socket:
     """Connect to *address* and return the socket object.
     Convenience function.  Connect to *address* (a 2-tuple ``(host,
     port)``) and return the socket object.  Passing the optional
@@ -227,13 +232,18 @@ async def aio_create_connection(address: Tuple[str, int], timeout: int = _GLOBAL
 
     host, port = address
     err = None
-    for res in await loop.getaddrinfo(host, port, family=0, type=socket.SOCK_STREAM):
+    for res in await loop.getaddrinfo(
+        host,
+        port,
+        family=0,
+        type=socket.SOCK_STREAM,
+    ):
         (
-            af, # family
-            socktype, # type
-            proto, # proto
-            _, # canonname
-            sa # sockaddr, ('::1', 3333, 0, 0)
+            af,  # family
+            socktype,  # type
+            proto,  # proto
+            _,  # canonname
+            sa,  # sockaddr, ('::1', 3333, 0, 0)
         ) = res
         sock = None
         try:
@@ -245,7 +255,7 @@ async def aio_create_connection(address: Tuple[str, int], timeout: int = _GLOBAL
             await loop.sock_connect(sock, sa)
             return sock
 
-        except socket.error:
+        except OSError:
             err = get_exception()
             if sock is not None:
                 sock.close()
@@ -253,11 +263,13 @@ async def aio_create_connection(address: Tuple[str, int], timeout: int = _GLOBAL
     if err is not None:
         raise err
     else:
-        raise socket.error("getaddrinfo returns an empty list")
+        raise OSError('getaddrinfo returns an empty list')
 
 
-def create_connection(address, timeout=_GLOBAL_DEFAULT_TIMEOUT,
-                      source_address=None):
+def create_connection(
+    address, timeout=_GLOBAL_DEFAULT_TIMEOUT,
+    source_address=None,
+):
     """Connect to *address* and return the socket object.
     Convenience function.  Connect to *address* (a 2-tuple ``(host,
     port)``) and return the socket object.  Passing the optional
@@ -284,7 +296,7 @@ def create_connection(address, timeout=_GLOBAL_DEFAULT_TIMEOUT,
             sock.connect(sa)
             return sock
 
-        except socket.error:
+        except OSError:
             err = get_exception()
             if sock is not None:
                 sock.close()
@@ -292,13 +304,14 @@ def create_connection(address, timeout=_GLOBAL_DEFAULT_TIMEOUT,
     if err is not None:
         raise err
     else:
-        raise socket.error("getaddrinfo returns an empty list")
+        raise OSError('getaddrinfo returns an empty list')
 
 
 class SpeedtestHTTPConnection(HTTPConnection):
     """Custom HTTPConnection to support source_address across
     Python 2.4 - Python 3
     """
+
     def __init__(self, *args, **kwargs):
         source_address = kwargs.pop('source_address', None)
         timeout = kwargs.pop('timeout', 10)
@@ -317,12 +330,14 @@ class SpeedtestHTTPConnection(HTTPConnection):
             self.sock = socket.create_connection(
                 (self.host, self.port),
                 self.timeout,
-                self.source_address)
+                self.source_address,
+            )
         except (AttributeError, TypeError):
             self.sock = create_connection(
                 (self.host, self.port),
                 self.timeout,
-                self.source_address)  
+                self.source_address,
+            )
 
         if self._tunnel_host:
             self._tunnel()
@@ -347,17 +362,19 @@ if HTTPSConnection:
             self.source_address = source_address
 
         def connect(self):
-            "Connect to a host on a given (SSL) port."
-            try:  
+            'Connect to a host on a given (SSL) port.'
+            try:
                 self.sock = socket.create_connection(
                     (self.host, self.port),
                     self.timeout,
-                    self.source_address)
+                    self.source_address,
+                )
             except (AttributeError, TypeError):
                 self.sock = create_connection(
                     (self.host, self.port),
                     self.timeout,
-                    self.source_address) 
+                    self.source_address,
+                )
 
             if self._tunnel_host:
                 self._tunnel()
@@ -365,7 +382,8 @@ if HTTPSConnection:
             if not ssl:
                 raise SpeedtestException(
                     'This version of Python does not support HTTPS/SSL '
-                    'functionality.')
+                    'functionality.',
+                )
 
             try:
                 kwargs = {}
@@ -392,7 +410,7 @@ def _build_connection(connection, source_address, timeout, context=None):
     def inner(host, **kwargs):
         kwargs.update({
             'source_address': source_address,
-            'timeout': timeout
+            'timeout': timeout,
         })
         if context:
             kwargs['context'] = context
@@ -404,6 +422,7 @@ class SpeedtestHTTPHandler(AbstractHTTPHandler):
     """Custom ``HTTPHandler`` that can build a ``HTTPConnection`` with the
     args we need for ``source_address`` and ``timeout``
     """
+
     def __init__(self, debuglevel=0, source_address=None, timeout=10):
         AbstractHTTPHandler.__init__(self, debuglevel)
         self.source_address = source_address
@@ -414,9 +433,10 @@ class SpeedtestHTTPHandler(AbstractHTTPHandler):
             _build_connection(
                 SpeedtestHTTPConnection,
                 self.source_address,
-                self.timeout
+                self.timeout,
             ),
-            req)
+            req,
+        )
 
     http_request = AbstractHTTPHandler.do_request_
 
@@ -425,8 +445,11 @@ class SpeedtestHTTPSHandler(AbstractHTTPHandler):
     """Custom ``HTTPSHandler`` that can build a ``HTTPSConnection`` with the
     args we need for ``source_address`` and ``timeout``
     """
-    def __init__(self, debuglevel=0, context=None, source_address=None,
-                 timeout=10):
+
+    def __init__(
+        self, debuglevel=0, context=None, source_address=None,
+        timeout=10,
+    ):
         AbstractHTTPHandler.__init__(self, debuglevel)
         self._context = context
         self.source_address = source_address
@@ -440,7 +463,8 @@ class SpeedtestHTTPSHandler(AbstractHTTPHandler):
                 self.timeout,
                 context=self._context,
             ),
-            req)
+            req,
+        )
 
     https_request = AbstractHTTPHandler.do_request_
 
@@ -457,13 +481,17 @@ def build_opener(source_address=None, timeout=10):
     source_address_tuple = (source_address, 0) if source_address else None
     handlers = [
         ProxyHandler(),
-        SpeedtestHTTPHandler(source_address=source_address_tuple,
-                             timeout=timeout),
-        SpeedtestHTTPSHandler(source_address=source_address_tuple,
-                              timeout=timeout),
+        SpeedtestHTTPHandler(
+            source_address=source_address_tuple,
+            timeout=timeout,
+        ),
+        SpeedtestHTTPSHandler(
+            source_address=source_address_tuple,
+            timeout=timeout,
+        ),
         HTTPDefaultErrorHandler(),
         HTTPRedirectHandler(),
-        HTTPErrorProcessor()
+        HTTPErrorProcessor(),
     ]
 
     opener = OpenerDirector()
@@ -481,12 +509,15 @@ class GzipDecodedResponse(GZIP_BASE):
     Largely copied from ``xmlrpclib``/``xmlrpc.client`` and modified
     to work for py2.4-py3
     """
+
     def __init__(self, response):
         # response doesn't support tell() and read(), required by
         # GzipFile
         if not gzip:
-            raise SpeedtestHTTPError('HTTP response body is gzip encoded, '
-                                     'but gzip support is not available')
+            raise SpeedtestHTTPError(
+                'HTTP response body is gzip encoded, '
+                'but gzip support is not available',
+            )
         IO = BytesIO or StringIO
         self.io = IO()
         while 1:
@@ -521,10 +552,12 @@ def distance(origin, destination):
 
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
-    a = (math.sin(dlat / 2) * math.sin(dlat / 2) +
-         math.cos(math.radians(lat1)) *
-         math.cos(math.radians(lat2)) * math.sin(dlon / 2) *
-         math.sin(dlon / 2))
+    a = (
+        math.sin(dlat / 2) * math.sin(dlat / 2) +
+        math.cos(math.radians(lat1)) *
+        math.cos(math.radians(lat2)) * math.sin(dlon / 2) *
+        math.sin(dlon / 2)
+    )
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return radius * c
 
@@ -534,11 +567,13 @@ def build_user_agent():
 
     ua_tuple = (
         'Mozilla/5.0',
-        '(%s; U; %s; en-us)' % (platform.platform(),
-                                platform.architecture()[0]),
+        '({}; U; {}; en-us)'.format(
+            platform.platform(),
+            platform.architecture()[0],
+        ),
         'Python/%s' % platform.python_version(),
         '(KHTML, like Gecko)',
-        'speedtest-cli/%s' % '2.1.4b1'
+        'speedtest-cli/%s' % '2.1.4b1',
     )
     # printer('User-Agent: %s' % user_agent, debug=True)
     return ' '.join(ua_tuple)
@@ -554,15 +589,17 @@ def build_request(url, data=None, headers=None, bump='0', secure=False):
 
     if url[0] == ':':
         scheme = ('http', 'https')[bool(secure)]
-        schemed_url = '%s%s' % (scheme, url)
+        schemed_url = f'{scheme}{url}'
     else:
         schemed_url = url
 
     delim = '&' if '?' in url else '?'
     # WHO YOU GONNA CALL? CACHE BUSTERS!
-    final_url = '%s%sx=%s.%s' % (schemed_url, delim,
-                                 int(timeit.time.time() * 1000),
-                                 bump)
+    final_url = '{}{}x={}.{}'.format(
+        schemed_url, delim,
+        int(timeit.time.time() * 1000),
+        bump,
+    )
 
     headers.update({
         'Cache-Control': 'no-cache',
@@ -650,17 +687,19 @@ class aioHTTPDownloader(aiobject):
         try:
             if (timeit.default_timer() - self.starttime) <= self.timeout:
                 f = self._opener(self.request)
-                while ((timeit.default_timer() - self.starttime) <=
-                        self.timeout):
+                while (
+                    (timeit.default_timer() - self.starttime) <=
+                    self.timeout
+                ):
                     self.result.append(len(f.read(10240)))
                     if self.result[-1] == 0:
                         break
                 f.close()
-        except IOError:
+        except OSError:
             pass
 
 
-class HTTPUploaderData(object):
+class HTTPUploaderData:
     """File like object to improve cutting off the upload once the timeout
     has been reached.
     """
@@ -680,14 +719,15 @@ class HTTPUploaderData(object):
         IO = BytesIO or StringIO
         try:
             self._data = IO(
-                ('content1=%s' %
-                 (chars * multiplier)[0:int(self.length) - 9]
-                 ).encode()
+                (
+                    'content1=%s' %
+                    (chars * multiplier)[0:int(self.length) - 9]
+                ).encode(),
             )
         except MemoryError:
             raise SpeedtestCLIError(
                 'Insufficient memory to pre-allocate upload data. Please '
-                'use --no-pre-allocate'
+                'use --no-pre-allocate',
             )
 
     @property
@@ -710,7 +750,15 @@ class HTTPUploaderData(object):
 
 class aioHTTPUploader(aiobject):
 
-    async def __init__(self, i, request, start, size, timeout, opener=None) -> None:
+    async def __init__(
+        self,
+        i,
+        request,
+        start,
+        size,
+        timeout,
+        opener=None
+    ) -> None:
         self.request = request
         self.request.data.start = self.starttime = start
         self.size = size
@@ -730,19 +778,21 @@ class aioHTTPUploader(aiobject):
                     # PY24 expects a string or buffer
                     # This also causes issues with Ctrl-C, but we will concede
                     # for the moment that Ctrl-C on PY24 isn't immediate
-                    request = build_request(self.request.get_full_url(),
-                                            data=request.data.read(self.size))
+                    request = build_request(
+                        self.request.get_full_url(),
+                        data=request.data.read(self.size),
+                    )
                     f = self._opener(request)
                 f.read(11)
                 f.close()
                 self.result = sum(self.request.data.total)
             else:
                 self.result = 0
-        except (IOError, SpeedtestUploadTimeout):
+        except (OSError, SpeedtestUploadTimeout):
             self.result = sum(self.request.data.total)
 
 
-class SpeedtestResults(object):
+class SpeedtestResults:
     """Class for holding the results of a speedtest, including:
     Download speed
     Upload speed
@@ -753,8 +803,10 @@ class SpeedtestResults(object):
     to get a share results image link.
     """
 
-    def __init__(self, download=0, upload=0, ping=0, server=None, client=None,
-                 opener=None, secure=False):
+    def __init__(
+        self, download=0, upload=0, ping=0, server=None, client=None,
+        opener=None, secure=False,
+    ):
         self.download = download
         self.upload = upload
         self.ping = ping
@@ -796,9 +848,11 @@ class SpeedtestResults(object):
             'screendpi=',
             'upload=%s' % upload,
             'testmethod=http',
-            'hash=%s' % md5(('%s-%s-%s-%s' %
-                             (ping, upload, download, '297aae72'))
-                            .encode()).hexdigest(),
+            'hash=%s' % md5((
+                '%s-%s-%s-%s' %
+                (ping, upload, download, '297aae72')
+            )
+                .encode()).hexdigest(),
             'touchscreen=none',
             'startmode=pingselect',
             'accuracy=1',
@@ -808,9 +862,11 @@ class SpeedtestResults(object):
         ]
 
         headers = {'Referer': 'http://c.speedtest.net/flash/speedtest.swf'}
-        request = build_request('://www.speedtest.net/api/api.php',
-                                data='&'.join(api_data).encode(),
-                                headers=headers, secure=self._secure)
+        request = build_request(
+            '://www.speedtest.net/api/api.php',
+            data='&'.join(api_data).encode(),
+            headers=headers, secure=self._secure,
+        )
         f, e = await catch_request(request, opener=self._opener)
         if e:
             raise ShareResultsConnectFailure(e)
@@ -820,14 +876,18 @@ class SpeedtestResults(object):
         f.close()
 
         if int(code) != 200:
-            raise ShareResultsSubmitFailure('Could not submit results to '
-                                            'speedtest.net')
+            raise ShareResultsSubmitFailure(
+                'Could not submit results to '
+                'speedtest.net',
+            )
 
         qsargs = parse_qs(response.decode())
         resultid = qsargs.get('resultid')
         if not resultid or len(resultid) != 1:
-            raise ShareResultsSubmitFailure('Could not submit results to '
-                                            'speedtest.net')
+            raise ShareResultsSubmitFailure(
+                'Could not submit results to '
+                'speedtest.net',
+            )
 
         self._share = 'http://www.speedtest.net/result/%s.png' % resultid[0]
 
@@ -852,8 +912,10 @@ class SpeedtestResults(object):
     def csv_header(delimiter=','):
         """Return CSV Headers"""
 
-        row = ['Server ID', 'Sponsor', 'Server Name', 'Timestamp', 'Distance',
-               'Ping', 'Download', 'Upload', 'Share', 'IP Address']
+        row = [
+            'Server ID', 'Sponsor', 'Server Name', 'Timestamp', 'Distance',
+            'Ping', 'Download', 'Upload', 'Share', 'IP Address',
+        ]
         out = StringIO()
         writer = csv.writer(out, delimiter=delimiter, lineterminator='')
         writer.writerow([to_utf8(v) for v in row])
@@ -865,10 +927,12 @@ class SpeedtestResults(object):
         data = self.dict()
         out = StringIO()
         writer = csv.writer(out, delimiter=delimiter, lineterminator='')
-        row = [data['server']['id'], data['server']['sponsor'],
-               data['server']['name'], data['timestamp'],
-               data['server']['d'], data['ping'], data['download'],
-               data['upload'], self._share or '', self.client['ip']]
+        row = [
+            data['server']['id'], data['server']['sponsor'],
+            data['server']['name'], data['timestamp'],
+            data['server']['d'], data['ping'], data['download'],
+            data['upload'], self._share or '', self.client['ip'],
+        ]
         writer.writerow([to_utf8(v) for v in row])
         return out.getvalue()
 
@@ -879,7 +943,7 @@ class SpeedtestResults(object):
         if pretty:
             kwargs.update({
                 'indent': 4,
-                'sort_keys': True
+                'sort_keys': True,
             })
         return json.dumps(self.dict(), **kwargs)
 
@@ -887,7 +951,13 @@ class SpeedtestResults(object):
 class Speedtest(aiobject):
     """Class for performing standard speedtest.net testing operations"""
 
-    async def __init__(self, config=None, source_address=None, timeout=10, secure=False):
+    async def __init__(
+        self,
+        config=None,
+        source_address=None,
+        timeout=10,
+        secure=False
+    ):
         self.config = {}
 
         self._source_address = source_address
@@ -925,8 +995,10 @@ class Speedtest(aiobject):
         if gzip:
             headers['Accept-Encoding'] = 'gzip'
 
-        request = build_request('://www.speedtest.net/speedtest-config.php',
-                                headers=headers, secure=self._secure)
+        request = build_request(
+            '://www.speedtest.net/speedtest-config.php',
+            headers=headers, secure=self._secure,
+        )
         uh, e = await catch_request(request, opener=self._opener)
         if e:
             raise ConfigRetrievalError(e)
@@ -947,7 +1019,7 @@ class Speedtest(aiobject):
         if int(uh.code) != 200:
             return None
 
-        configxml = ''.encode().join(configxml_list)
+        configxml = b''.join(configxml_list)
 
         debug('Config XML:\n%s' % configxml, isdebug=DEBUG)
 
@@ -957,7 +1029,7 @@ class Speedtest(aiobject):
             except ET.ParseError:
                 e = get_exception()
                 raise SpeedtestConfigError(
-                    'Malformed speedtest.net configuration: %s' % e
+                    'Malformed speedtest.net configuration: %s' % e,
                 )
             server_config = root.find('server-config').attrib
             download = root.find('download').attrib
@@ -970,7 +1042,8 @@ class Speedtest(aiobject):
             except ExpatError:
                 e = get_exception()
                 raise SpeedtestConfigError(
-                    'Malformed speedtest.net configuration: %s' % e)
+                    'Malformed speedtest.net configuration: %s' % e,
+                )
             server_config = get_attributes_by_tag_name(root, 'server-config')
             download = get_attributes_by_tag_name(root, 'download')
             upload = get_attributes_by_tag_name(root, 'upload')
@@ -983,8 +1056,10 @@ class Speedtest(aiobject):
         up_sizes = [32768, 65536, 131072, 262144, 524288, 1048576, 7340032]
         sizes = {
             'upload': up_sizes[ratio - 1:],
-            'download': [350, 500, 750, 1000, 1500, 2000, 2500,
-                         3000, 3500, 4000]
+            'download': [
+                350, 500, 750, 1000, 1500, 2000, 2500,
+                3000, 3500, 4000,
+            ],
         }
 
         size_count = len(sizes['upload'])
@@ -993,17 +1068,17 @@ class Speedtest(aiobject):
 
         counts = {
             'upload': upload_count,
-            'download': int(download['threadsperurl'])
+            'download': int(download['threadsperurl']),
         }
 
         threads = {
             'upload': int(upload['threads']),
-            'download': int(server_config['threadcount']) * 2
+            'download': int(server_config['threadcount']) * 2,
         }
 
         length = {
             'upload': int(upload['testlength']),
-            'download': int(download['testlength'])
+            'download': int(download['testlength']),
         }
 
         self.config.update({
@@ -1013,7 +1088,7 @@ class Speedtest(aiobject):
             'counts': counts,
             'threads': threads,
             'length': length,
-            'upload_max': upload_count * size_count
+            'upload_max': upload_count * size_count,
         })
 
         try:
@@ -1021,13 +1096,18 @@ class Speedtest(aiobject):
         except ValueError:
             raise SpeedtestConfigError(
                 'Unknown location: lat=%r lon=%r' %
-                (client.get('lat'), client.get('lon')))
+                (client.get('lat'), client.get('lon')),
+            )
 
         debug('Config:\n%r' % self.config, isdebug=DEBUG)
 
         return self.config
 
-    async def get_servers(self, servers: list = None, exclude: list = None) -> list:
+    async def get_servers(
+        self,
+        servers: list = None,
+        exclude: list = None
+    ) -> list:
         # sourcery no-metrics
         """Retrieve a the list of speedtest.net servers, optionally filtered
         to servers matching those specified in the ``servers`` argument
@@ -1046,18 +1126,19 @@ class Speedtest(aiobject):
                     server_list[i] = int(s)
                 except ValueError:
                     raise InvalidServerIDType(
-                        '%s is an invalid server type, must be int' % s)
+                        '%s is an invalid server type, must be int' % s,
+                    )
 
         urls = [
             '://www.speedtest.net/speedtest-servers-static.php',
             'http://c.speedtest.net/speedtest-servers-static.php',
             '://www.speedtest.net/speedtest-servers.php',
-            'http://c.speedtest.net/speedtest-servers.php',]
+            'http://c.speedtest.net/speedtest-servers.php', ]
 
         headers = {}
         if gzip:
             headers['Accept-Encoding'] = 'gzip'
-        
+
         async def __request_xmls(url, opener, secure, errors):
             request = build_request(url, headers=headers, secure=self._secure)
             uh, e = await catch_request(request, opener=opener)
@@ -1080,12 +1161,16 @@ class Speedtest(aiobject):
             uh.close()
 
             if int(uh.code) != 200:
-                return None # raise ServersRetrievalError()
+                return None  # raise ServersRetrievalError()
 
             return serversxml_list
 
         errors = []
-        coroutines = [__request_xmls(url, self._opener, False, errors) for url in urls]        
+        coroutines = [
+            __request_xmls(
+                url, self._opener, False, errors,
+            ) for url in urls
+        ]
         completed, pending = await asyncio.wait(coroutines)
 
         servers_xml_list = list(
@@ -1093,11 +1178,12 @@ class Speedtest(aiobject):
                 lambda task: task is not None,
                 [
                     task.result() for task in completed
-                ]
-            ))
+                ],
+            ),
+        )
 
         for serversxml_list in servers_xml_list:
-            serversxml = ''.encode().join(serversxml_list)
+            serversxml = b''.join(serversxml_list)
 
             # printer('Servers XML:\n%s' % serversxml, debug=True)
 
@@ -1108,7 +1194,7 @@ class Speedtest(aiobject):
                     except ET.ParseError:
                         e = get_exception()
                         raise SpeedtestServersError(
-                            'Malformed speedtest.net server list: %s' % e
+                            'Malformed speedtest.net server list: %s' % e,
                         )
                     elements = etree_iter(root, 'server')
                 except AttributeError:
@@ -1117,7 +1203,7 @@ class Speedtest(aiobject):
                     except ExpatError:
                         e = get_exception()
                         raise SpeedtestServersError(
-                            'Malformed speedtest.net server list: %s' % e
+                            'Malformed speedtest.net server list: %s' % e,
                         )
                     elements = root.getElementsByTagName('server')
             except (SyntaxError, xml.parsers.expat.ExpatError):
@@ -1132,14 +1218,20 @@ class Speedtest(aiobject):
                 if servers and int(attrib.get('id')) not in servers:
                     continue
 
-                if (int(attrib.get('id')) in self.config['ignore_servers']
-                        or int(attrib.get('id')) in exclude):
+                if (
+                    int(attrib.get('id')) in self.config['ignore_servers']
+                    or int(attrib.get('id')) in exclude
+                ):
                     continue
 
                 try:
-                    d = distance(self.lat_lon,
-                                    (float(attrib.get('lat')),
-                                    float(attrib.get('lon'))))
+                    d = distance(
+                        self.lat_lon,
+                        (
+                            float(attrib.get('lat')),
+                            float(attrib.get('lon')),
+                        ),
+                    )
                 except Exception:
                     continue
 
@@ -1167,36 +1259,49 @@ class Speedtest(aiobject):
         request = build_request(url)
         uh, e = await catch_request(request, opener=self._opener)
         if e:
-            raise SpeedtestMiniConnectFailure('Failed to connect to %s' % server)
+            raise SpeedtestMiniConnectFailure(
+                'Failed to connect to %s' % server,
+            )
         text = uh.read()
         uh.close()
 
-        extension = re.findall('upload_?[Ee]xtension: "([^"]+)"', text.decode())
+        extension = re.findall(
+            'upload_?[Ee]xtension: "([^"]+)"', text.decode(),
+        )
         if not extension:
             for ext in ['php', 'asp', 'aspx', 'jsp']:
                 try:
                     f = self._opener.open(
-                        '%s/speedtest/upload.%s' % (url, ext))
+                        f'{url}/speedtest/upload.{ext}',
+                    )
                 except Exception:
                     pass
                 else:
                     data = f.read().strip().decode()
-                    if (f.code == 200 and
-                            len(data.splitlines()) == 1 and
-                            re.match('size=[0-9]', data)):
+                    if (
+                        f.code == 200 and
+                        len(data.splitlines()) == 1 and
+                        re.match('size=[0-9]', data)
+                    ):
                         extension = [ext]
                         break
 
         if not urlparts or not extension:
-            raise InvalidSpeedtestMiniServer('Invalid Speedtest Mini Server: %s' % server)
+            raise InvalidSpeedtestMiniServer(
+                'Invalid Speedtest Mini Server: %s' % server,
+            )
 
         self.servers = [{
             'sponsor': 'Speedtest Mini',
             'name': urlparts[1],
             'd': 0,
-            'url': '%s/speedtest/upload.%s' % (url.rstrip('/'), extension[0]),
+            'url': '{}/speedtest/upload.{}'.format(
+                url.rstrip('/'),
+                extension[0],
+            ),
             'latency': 0,
-            'id': 0}]
+            'id': 0,
+        }]
 
         return self.servers
 
@@ -1247,26 +1352,26 @@ class Speedtest(aiobject):
             cum = []
             url = os.path.dirname(server['url'])
             stamp = int(timeit.time.time() * 1000)
-            latency_url = '%s/latency.txt?x=%s' % (url, stamp)
-            for i in range(3):
-                this_latency_url = '%s.%s' % (latency_url, i)
+            latency_url = f'{url}/latency.txt?x={stamp}'
+            for _ in range(3):
+                # this_latency_url = f'{latency_url}.{i}'
                 # printer('%s %s' % ('GET', this_latency_url), debug=True)
                 urlparts = urlparse(latency_url)
                 try:
                     if urlparts[0] == 'https':
                         h = SpeedtestHTTPSConnection(
                             urlparts[1],
-                            source_address=source_address_tuple
+                            source_address=source_address_tuple,
                         )
                     else:
                         h = SpeedtestHTTPConnection(
                             urlparts[1],
-                            source_address=source_address_tuple
+                            source_address=source_address_tuple,
                         )
                     headers = {'User-Agent': user_agent}
-                    path = '%s?%s' % (urlparts[2], urlparts[4])
+                    path = '{}?{}'.format(urlparts[2], urlparts[4])
                     start = timeit.default_timer()
-                    h.request("GET", path, headers=headers)
+                    h.request('GET', path, headers=headers)
                     r = h.getresponse()
                     total = (timeit.default_timer() - start)
                 except HTTP_ERRORS:
@@ -1276,7 +1381,7 @@ class Speedtest(aiobject):
                     continue
 
                 text = r.read(9)
-                if int(r.status) == 200 and text == 'test=test'.encode():
+                if int(r.status) == 200 and text == b'test=test':
                     cum.append(total)
                 else:
                     cum.append(3600)
@@ -1288,7 +1393,9 @@ class Speedtest(aiobject):
         try:
             fastest = sorted(results.keys())[0]
         except IndexError:
-            raise SpeedtestBestServerFailure('Unable to connect to servers to test latency.')
+            raise SpeedtestBestServerFailure(
+                'Unable to connect to servers to test latency.',
+            )
 
         best = results[fastest]
         best['latency'] = fastest
@@ -1313,16 +1420,25 @@ class Speedtest(aiobject):
         for size in self.config['sizes']['download']:
             for _ in range(0, self.config['counts']['download']):
                 best = await self.best
-                urls.append('%s/random%sx%s.jpg' %
-                            (os.path.dirname(best['url']), size, size))
+                urls.append(
+                    '%s/random%sx%s.jpg' %
+                    (os.path.dirname(best['url']), size, size),
+                )
 
         requests = []
         for i, url in enumerate(urls):
             requests.append(
-                build_request(url, bump=i, secure=self._secure))
+                build_request(url, bump=i, secure=self._secure),
+            )
 
         async def __aio_http_download(i, request, start, timeout, opener):
-            aiod = await aioHTTPDownloader(i, request, start, timeout, opener=opener)
+            aiod = await aioHTTPDownloader(
+                i,
+                request,
+                start,
+                timeout,
+                opener=opener,
+            )
             return aiod.result
 
         start = timeit.default_timer()
@@ -1333,10 +1449,10 @@ class Speedtest(aiobject):
                 request,
                 start,
                 self.config['length']['download'],
-                self._opener
+                self._opener,
             ) for (
                 i,
-                request
+                request,
             ) in enumerate(requests)
         ]
         completed, _ = await asyncio.wait(coroutines)
@@ -1348,11 +1464,16 @@ class Speedtest(aiobject):
 
         self.results.bytes_received = sum(finished)
         self.results.download = (
-            (self.results.bytes_received / (stop - start)) * 8.0)
+            (self.results.bytes_received / (stop - start)) * 8.0
+        )
 
         return self.results.download
 
-    async def upload(self, callback=do_nothing, pre_allocate: bool = True) -> int:
+    async def upload(
+        self,
+        callback=do_nothing,
+        pre_allocate: bool = True
+    ) -> int:
         """Test upload speed against speedtest.net
         Args:
             callback ([type], optional): [description]. Defaults to do_nothing.
@@ -1372,7 +1493,7 @@ class Speedtest(aiobject):
             data = HTTPUploaderData(
                 size,
                 0,
-                self.config['length']['upload']
+                self.config['length']['upload'],
             )
             if pre_allocate:
                 data.pre_allocate()
@@ -1380,14 +1501,25 @@ class Speedtest(aiobject):
             best = await self.best
             requests.append(
                 (
-                    build_request(best['url'], data, secure=self._secure,
-                        headers=headers),
-                    size))
-        
+                    build_request(
+                        best['url'], data, secure=self._secure,
+                        headers=headers,
+                    ),
+                    size,
+                ),
+            )
+
         async def __aio_http_upload(i, request, start, size, timeout, opener):
-            aiod = await aioHTTPUploader(i, request, start, size, timeout, opener=opener)
+            aiod = await aioHTTPUploader(
+                i,
+                request,
+                start,
+                size,
+                timeout,
+                opener=opener,
+            )
             return aiod.result
-        
+
         start = timeit.default_timer()
 
         coroutines = [
@@ -1397,10 +1529,10 @@ class Speedtest(aiobject):
                 start,
                 request[1],
                 self.config['length']['upload'],
-                self._opener
+                self._opener,
             ) for (
                 i,
-                request
+                request,
             ) in enumerate(requests[:request_count])
         ]
         completed, _ = await asyncio.wait(coroutines)
@@ -1410,5 +1542,6 @@ class Speedtest(aiobject):
         stop = timeit.default_timer()
         self.results.bytes_sent = sum(finished)
         self.results.upload = (
-            (self.results.bytes_sent / (stop - start)) * 8.0)
+            (self.results.bytes_sent / (stop - start)) * 8.0
+        )
         return self.results.upload

@@ -117,3 +117,4 @@ bot.ini
 *.session-journal
 *.ini
 scp/logs/*.txt
+scp/plugins/private/*.py
