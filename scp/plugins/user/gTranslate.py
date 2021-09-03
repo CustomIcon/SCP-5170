@@ -84,13 +84,9 @@ async def _(_, message: user.types.Message):
 
 @user.on_message(user.sudo & user.command('tts'))
 async def _(_, message: user.types.Message):
-    if len(message.command) != 1:
-        text = message.text.split(None, 1)[1]
-    else:
-        text = None
-    if message.reply_to_message:
-        if message.reply_to_message.text:
-            text = message.reply_to_message.text
+    text = message.text.split(None, 1)[1] if len(message.command) != 1 else None
+    if message.reply_to_message and message.reply_to_message.text:
+        text = message.reply_to_message.text
     async with aiofiles.open('tts.mp3', 'wb') as file:
         await trl.tts(text, file=file, targetlang='en')
     await message.reply_audio('tts.mp3')

@@ -42,18 +42,12 @@ async def _(_, message: user.types.Message):
 
 @user.on_message(user.sudo & user.command('listPipes'))
 async def _(_, message: user.types.Message):
-    try:
-        x = await user.get_inline_bot_results(
-            info['_bot_username'],
-            'pipeList',
-        )
-    except (
-        errors.exceptions.bad_request_400.PeerIdInvalid,
-        errors.exceptions.bad_request_400.BotResponseTimeout,
-    ):
-        return await message.reply('no pipes', quote=True)
     if len(_chats) == 0:
-        return await message.reply('No pipes running')
+        return await message.reply('No pipes running', quote=True)
+    x = await user.get_inline_bot_results(
+        info['_bot_username'],
+        'pipeList',
+    )
     for m in x.results:
         await message.reply_inline_bot_result(x.query_id, m.id, quote=True)
 
