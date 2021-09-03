@@ -1,3 +1,6 @@
+from pyrogram import types
+
+
 def get_readable_time(seconds: int) -> str:
     count = 0
     ping_time = ''
@@ -23,16 +26,11 @@ def get_readable_time(seconds: int) -> str:
     return ping_time
 
 
-def getMediaAttr(o: object):
-    AttrList = [
-        'photo',
-        'video',
-        'animation',
-        'document',
-        'sticker',
-        'voice',
-    ]
-    for a in AttrList:
-        attr = getattr(o, a)
+def getMediaAttr(
+    message: types.Message,
+    Attr: list,
+):
+    for attribute in Attr:
+        attr = getattr(message, attribute)
         if attr:
             return attr

@@ -10,6 +10,7 @@ from io import StringIO, BytesIO
 from scp import user, bot
 from pyrogram import errors
 from scp.utils.selfInfo import info
+from scp.utils.parser import getMediaAttr
 
 exec_tasks = {}
 
@@ -204,6 +205,58 @@ async def cancelexec(_, query: user.types.CallbackQuery):
             )
         task.cancel()
         return await query.edit_message_text(f'{taskID} has been cancelled')
+
+
+@user.on_message(
+    user.sudo
+    & user.command('GetID'),
+)
+async def _(_, message: user.types.Message):
+    message = message.reply_to_message or message
+    media = getMediaAttr(
+        message,
+        [
+            "audio",
+            "document",
+            "photo",
+            "sticker",
+            "animation",
+            "video",
+            "voice",
+            "video_note",
+            "new_chat_photo",
+        ]
+    )
+    appendable = [
+        user.md.KeyValueItem(
+            user.md.Bold('chatID'),
+            user.md.Code(message.chat.id)
+        ),
+        user.md.KeyValueItem(
+            user.md.Bold('fromUserID'),
+            user.md.Code(message.from_user.id)
+        ),
+    ]
+    text = user.md.Section('getID')
+    if not media:
+        for a in appendable:
+            text.append(a)
+        return await message.reply(user.md.KanTeXDocument(text))
+    medias = [
+        user.md.KeyValueItem(
+            user.md.Bold('fileID'),
+            user.md.Code(media.file_id)
+        ),
+        user.md.KeyValueItem(
+            user.md.Bold('fileUniqueID'),
+            user.md.Code(media.file_unique_id)
+        ),
+    ]
+    for media in medias:
+        appendable.append(media)
+    for a in appendable:
+        text.append(a)
+    return await message.reply(user.md.KanTeXDocument(text))
 
 
 def _gf(body):

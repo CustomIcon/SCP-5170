@@ -19,43 +19,43 @@ __DOC__ = str(
 @user.on_message(
     user.sudo
     & (user.filters.reply | ~user.filters.text)
-    & user.command('uploadFile')
+    & user.command('uploadFile'),
 )
 async def _(_, message: user.types.Message):
     f = await message.reply_to_message.download()
-    r = await message.reply('**Uploading**')
+    r = await message.reply('**Uploading**', quote=True)
     out = await user.postRequest(
-        f'https://api.anonfiles.com/upload',
-        data={'file': open(f, 'rb')}
+        'https://api.anonfiles.com/upload',
+        data={'file': open(f, 'rb')},
     )
     os.remove(f)
     if out['status']:
         text = user.md.KanTeXDocument(
-            user.md.Section('FileUploaded',
+            user.md.Section(
+                'FileUploaded',
                 user.md.KeyValueItem(
                     user.md.Bold('id'),
                     user.md.Code(
-                        out['data']['file']['metadata']['id']
-                    )
+                        out['data']['file']['metadata']['id'],
+                    ),
                 ),
                 user.md.KeyValueItem(
                     user.md.Bold(
-                        'size'
+                        'size',
                     ),
                     user.md.Code(
-                        out['data']['file']['metadata']['size']['readable']
-                    )
+                        out['data']['file']['metadata']['size']['readable'],
+                    ),
                 ),
                 user.md.KeyValueItem(
                     user.md.Bold(
-                        'link'
+                        'link',
                     ),
                     user.md.Link(
                         out['data']['file']['metadata']['name'],
-                        out['data']['file']['url']['short']
-                    )
+                        out['data']['file']['url']['short'],
+                    ),
                 ),
-            )
+            ),
         )
         return await r.edit(text)
-    

@@ -76,13 +76,13 @@ def _parseReport(report: str):
     user.filters.group
     & user.filters.reply
     & (
-        user.filters.regex(r'^@(A|a)dmin')
+        user.filters.regex(r'(?i)@admin(s)?')
         | user.command('report', prefixes='/')
     ),
 )
 async def _(_, message: user.types.Message):
     """
-    [WIP] a function to log admin calls
+    a function to log admin calls
     """
     uid = message.from_user.id if message.from_user else message.sender_chat.id
     url = message.reply_to_message.link
