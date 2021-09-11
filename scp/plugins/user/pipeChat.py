@@ -1,6 +1,5 @@
 from scp import user, bot
 from scp.utils.selfInfo import info
-from pyrogram import errors
 
 
 __PLUGIN__ = 'pipeChat'

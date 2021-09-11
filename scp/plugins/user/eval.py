@@ -216,25 +216,25 @@ async def _(_, message: user.types.Message):
     media = getMediaAttr(
         message,
         [
-            "audio",
-            "document",
-            "photo",
-            "sticker",
-            "animation",
-            "video",
-            "voice",
-            "video_note",
-            "new_chat_photo",
-        ]
+            'audio',
+            'document',
+            'photo',
+            'sticker',
+            'animation',
+            'video',
+            'voice',
+            'video_note',
+            'new_chat_photo',
+        ],
     )
     appendable = [
         user.md.KeyValueItem(
             user.md.Bold('chatID'),
-            user.md.Code(message.chat.id)
+            user.md.Code(message.chat.id),
         ),
         user.md.KeyValueItem(
             user.md.Bold('fromUserID'),
-            user.md.Code(message.from_user.id)
+            user.md.Code(message.from_user.id),
         ),
     ]
     text = user.md.Section('getID')
@@ -245,11 +245,11 @@ async def _(_, message: user.types.Message):
     medias = [
         user.md.KeyValueItem(
             user.md.Bold('fileID'),
-            user.md.Code(media.file_id)
+            user.md.Code(media.file_id),
         ),
         user.md.KeyValueItem(
             user.md.Bold('fileUniqueID'),
-            user.md.Code(media.file_unique_id)
+            user.md.Code(media.file_unique_id),
         ),
     ]
     for media in medias:

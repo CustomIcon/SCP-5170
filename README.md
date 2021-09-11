@@ -47,7 +47,7 @@ scp.bot.command - command filter for bot
 from scp import user
 
 @user.on_message(
-    user.sudo 
+    user.sudo
     & user.command('hello')
     & user.filters.text
 )
