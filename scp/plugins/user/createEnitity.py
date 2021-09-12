@@ -1,8 +1,6 @@
 import asyncio
-import base64
-import binascii
-import re
 from scp import user
+from scp.utils import parser
 
 
 __PLUGIN__ = 'create'
@@ -17,6 +15,9 @@ __DOC__ = str(
         ),
     ),
 )
+
+
+convLock = asyncio.Lock()
 
 
 @user.on_message(user.sudo & user.command('create'))
@@ -52,11 +53,12 @@ async def _(_, message: user.types.Message):
     elif arg[0].lower() == 'channel':
         chat = await user.create_channel(title=arg[1])
     elif arg[0].lower() == 'bot':
-        await user.send_message('BotFather', '/newbot')
-        await asyncio.sleep(0.5)
-        await user.send_message('Botfather', arg[1])
-        await asyncio.sleep(0.5)
-        botName = arg[1].replace(' ', '_') + '_bot'
+        async with convLock:
+            await user.send_message('BotFather', '/newbot')
+            await asyncio.sleep(0.5)
+            await user.send_message('Botfather', arg[1])
+            await asyncio.sleep(0.5)
+        botName = arg[1].replace(' ', '_')
         ans = await user.ask('Botfather', botName)
         if not ans.text.startswith('Done!'):
             return await message.reply(
@@ -70,7 +72,7 @@ async def _(_, message: user.types.Message):
                 ),
                 quote=True,
             )
-        validate, token = check(ans.text)
+        validate, token = parser.checkToken(ans.text)
         if validate:
             return await message.reply(
                 user.md.KanTeXDocument(
@@ -78,9 +80,13 @@ async def _(_, message: user.types.Message):
                         'Generated Token',
                         user.md.KeyValueItem(
                             user.md.Code(
-                                botName,
+                                '@' + botName,
                             ),
                             user.md.Code(token),
+                        ),
+                        user.md.KeyValueItem(
+                            user.md.Bold('Link'),
+                            f't.me/{botName}',
                         ),
                     ),
                 ),
@@ -109,26 +115,3 @@ async def _(_, message: user.types.Message):
             ),
         ),
     )
-
-
-def validate(token: str) -> bool:
-    t = token.partition(':')
-    try:
-        decode = base64.urlsafe_b64decode(f'{t[-1]}====')
-    except binascii.Error:
-        return False
-    return all(
-        (
-            t[0].isdecimal(),
-            decode[:2].startswith(b'\x00\x01'),
-            len(decode),
-        ),
-    )
-
-
-def check(token: str) -> bool:
-    token = re.findall(r'[0-9]{10}:[a-zA-Z0-9_-]{35}', token)
-    if len(token) == 0:
-        return False, False
-    else:
-        return True, token[0]

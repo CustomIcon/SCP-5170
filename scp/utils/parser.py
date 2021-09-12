@@ -1,4 +1,5 @@
 from pyrogram import types
+import re
 
 
 def get_readable_time(seconds: int) -> str:
@@ -34,3 +35,14 @@ def getMediaAttr(
         attr = getattr(message, attribute)
         if attr:
             return attr
+
+
+def checkToken(token: str) -> bool:
+    token = re.findall(
+        r'[0-9]{10}:[a-zA-Z0-9_-]{35}',
+        token,
+    )
+    if len(token) == 0:
+        return False, False
+    else:
+        return True, token[0]
