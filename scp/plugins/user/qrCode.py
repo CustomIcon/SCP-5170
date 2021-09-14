@@ -81,7 +81,6 @@ async def _(_, message: user.types.Message):
         and not message.reply_to_message.photo
     ):
         return
-
     f = await message.reply_to_message.download()
     for x in BarCodeReader().decode(f):
         out = reFresh(x)

@@ -2,7 +2,7 @@ from pyrogram import types
 import re
 
 
-def get_readable_time(seconds: int) -> str:
+def HumanizeTime(seconds: int) -> str:
     count = 0
     ping_time = ''
     time_list = []

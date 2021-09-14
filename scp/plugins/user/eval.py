@@ -28,9 +28,6 @@ exec_tasks = {}
 )
 async def pyexec(client: user, message: user.types.Message):
     code = message.text.split(None, 1)[1]
-
-    class UniqueExecReturnIdentifier:
-        pass
     tree = ast.parse(code)
     obody = tree.body
     body = obody.copy()
@@ -295,3 +292,7 @@ def _gf(body):
     fl = locals().copy()
     exec(compile(mod, '<ast>', 'exec'), globals(), fl)
     return fl['ex']
+
+
+class UniqueExecReturnIdentifier:
+    pass
