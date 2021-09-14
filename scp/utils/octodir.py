@@ -11,8 +11,8 @@ class repo_info:
 
 
 class api_urls:
-    recursive = "https://api.github.com/repos/{}/git/trees/{}?recursive=1"
-    no_recursive = "https://api.github.com/repos/{}/git/trees/{}"
+    recursive = 'https://api.github.com/repos/{}/git/trees/{}?recursive=1'
+    no_recursive = 'https://api.github.com/repos/{}/git/trees/{}'
 
 
 class OctodirException(Exception):
@@ -24,9 +24,9 @@ def mkdirs(path):
         os.makedirs(path)
 
 
-class Octodir(object):
+class Octodir:
     def __init__(self, folder_url, output_folder):
-        super(Octodir, self).__init__()
+        super().__init__()
         self.folder_url = folder_url
         self.output_folder = output_folder
 
@@ -37,11 +37,12 @@ class Octodir(object):
     def __get_raw_url(
         self,
         file_path: str,
-        url: str
+        url: str,
     ):
         tmp_url = url.replace(
             'https://api.github.com/repos/',
-            'https://raw.githubusercontent.com/')
+            'https://raw.githubusercontent.com/',
+        )
         tmp_url = tmp_url.split('/git/blobs/')[0]
         tmp_url = tmp_url + '/' + self.branch + '/' + file_path
 
@@ -49,7 +50,12 @@ class Octodir(object):
 
     async def __get_repo_tree(self):
         async with aiohttp.ClientSession() as ses:
-            api = await ses.get(api_urls.recursive.format(self.repo, self.branch))
+            api = await ses.get(
+                api_urls.recursive.format(
+                    self.repo,
+                    self.branch,
+                ),
+            )
         files = json.loads((await api.read()).decode('utf-8'))
         output = []
         location = {}
@@ -69,7 +75,7 @@ class Octodir(object):
 
     def __scrutinize_url(
         self,
-        folder_url: str
+        folder_url: str,
     ):
         try:
             cutted_url = folder_url.replace('https://github.com/', '')
@@ -84,7 +90,7 @@ class Octodir(object):
             repo_data = repo_info()
             repo_data.repo = owner + '/' + repo
             repo_data.branch = branch
-            repo_data.target_dir = "/".join(target_dir)
+            repo_data.target_dir = '/'.join(target_dir)
 
             return repo_data
         except IndexError:
@@ -93,8 +99,11 @@ class Octodir(object):
     async def __api_response(self):
         repo_data = self.__scrutinize_url(self.folder_url)
         async with aiohttp.ClientSession() as ses:
-            api = await ses.get(api_urls.no_recursive.format(
-            repo_data.repo, repo_data.branch))
+            api = await ses.get(
+                api_urls.no_recursive.format(
+                    repo_data.repo, repo_data.branch,
+                ),
+            )
         return json.loads((await api.read()).decode('utf-8'))
 
     def __check_valid_output(self):
@@ -113,18 +122,22 @@ class Octodir(object):
             start = 0
         else:
             tmp_target = target_folder.replace('./', '').replace('../', '')
-            tmp_target = (tmp_target if tmp_target[-1] != '/'
-                          else tmp_target[:-1])
+            tmp_target = (
+                tmp_target if tmp_target[-1] != '/'
+                else tmp_target[:-1]
+            )
             start = data[1][target_folder]
         for i in data[0][start:]:
             ndir = i[0].replace(
-                self.target_dir, self.target_dir.split('/')[-1:][0])
+                self.target_dir, self.target_dir.split('/')[-1:][0],
+            )
             if recursive or ndir.split(target_folder)[1].count('/') \
                     <= 1:
                 # Check output dir variable
                 mkdirs(os.path.join(self.output_folder, os.path.dirname(ndir)))
                 urllib.request.urlretrieve(
-                    i[1], os.path.join(self.output_folder, ndir))
+                    i[1], os.path.join(self.output_folder, ndir),
+                )
 
     async def dowload_folder(self):
         check_repo = await self.__api_response()

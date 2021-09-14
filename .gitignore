@@ -118,3 +118,4 @@ bot.ini
 *.ini
 scp/logs/*.txt
 scp/plugins/private/*.py
+test.py
