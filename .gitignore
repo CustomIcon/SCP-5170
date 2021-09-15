@@ -119,3 +119,4 @@ bot.ini
 scp/logs/*.txt
 scp/plugins/private/*.py
 test.py
+unknown_errors.txt

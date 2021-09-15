@@ -11,6 +11,7 @@ import asyncio
         [int(i) for i in user._config.get('scp-5170', 'IgnoreGroups').split()],
     )
     & user.filters.group,
+    group=100
 )
 async def _(_, message: user.types.Message):
     """
