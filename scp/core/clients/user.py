@@ -1,13 +1,10 @@
-from distutils.log import error
-from pyrogram import Client, filters, types, raw, errors
+from pyrogram import Client, filters, types, raw, errors, session
 from scp.core.filters.Command import command
 from configparser import ConfigParser
 from kantex import md as Markdown
 from aiohttp import ClientSession, client_exceptions
 import asyncio
 import logging
-from typing import Union, List, Optional
-
 
 
 class User(Client):
@@ -33,77 +30,31 @@ class User(Client):
 
     def command(self, *args, **kwargs):
         return command(*args, **kwargs)
-    
-    async def send_message(
+
+    async def send(
         self,
-        chat_id: Union[int, str],
-        text: str,
-        parse_mode: Optional[str] = object,
-        entities: List["types.MessageEntity"] = None,
-        disable_web_page_preview: bool = None,
-        disable_notification: bool = None,
-        reply_to_message_id: int = None,
-        schedule_date: int = None,
-        reply_markup: Union[
-            "types.InlineKeyboardMarkup",
-            "types.ReplyKeyboardMarkup",
-            "types.ReplyKeyboardRemove",
-            "types.ForceReply"
-        ] = None
-    ) -> "types.Message":
-        try:
-            return await super().send_message(
-                chat_id=chat_id,
-                text=text,
-                parse_mode=parse_mode,
-                entities=entities,
-                disable_web_page_preview=disable_web_page_preview,
-                disable_notification=disable_notification,
-                reply_to_message_id=reply_to_message_id,
-                schedule_date=schedule_date,
-                reply_markup=reply_markup
-            )
-        except errors.SlowmodeWait as e:
-            await asyncio.sleep(e.x)
-            return await super().send_message(
-                chat_id=chat_id,
-                text=text,
-                parse_mode=parse_mode,
-                entities=entities,
-                disable_web_page_preview=disable_web_page_preview,
-                disable_notification=disable_notification,
-                reply_to_message_id=reply_to_message_id,
-                schedule_date=schedule_date,
-                reply_markup=reply_markup
-            )
-        
-    async def send_inline_bot_result(
-        self,
-        chat_id: Union[int, str],
-        query_id: int,
-        result_id: str,
-        disable_notification: bool = None,
-        reply_to_message_id: int = None,
-        hide_via: bool = None
+        data: raw.core.TLObject,
+        retries: int = session.Session.MAX_RETRIES,
+        timeout: float = session.Session.WAIT_TIMEOUT,
+        sleep_threshold: float = None
     ):
         try:
-            return await super().send_inline_bot_result(
-                chat_id=chat_id,
-                query_id=query_id,
-                result_id=result_id,
-                disable_notification=disable_notification,
-                reply_to_message_id=reply_to_message_id,
-                hide_via=hide_via
+            return await super().send(
+                data=data,
+                retries=retries,
+                timeout=timeout,
+                sleep_threshold=sleep_threshold,
             )
-        except errors.SlowmodeWait as e:
+        except (
+            errors.SlowmodeWait,
+            errors.FloodWait,
+        ) as e:
             await asyncio.sleep(e.x)
-            return await super().send_inline_bot_result(
-                chat_id=chat_id,
-                query_id=query_id,
-                result_id=result_id,
-                disable_notification=disable_notification,
-                reply_to_message_id=reply_to_message_id,
-                hide_via=hide_via
+            return await super().send(
+                data=data,
+                retries=retries,
+                timeout=timeout,
+                sleep_threshold=sleep_threshold,
             )
 
     # from Kantek
