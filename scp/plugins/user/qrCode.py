@@ -63,8 +63,9 @@ async def _(_, message: user.types.Message):
         return await message.delete()
     data = _gen(message.text.split(None, 1)[1])
     await message.reply_document(
-        (await user.postRequest(
+        (await user.Request(
             'https://api.qrcode-monkey.com//qr/custom',
+            type='post',
             json=data,
         )
         )['imageUrl'].replace(

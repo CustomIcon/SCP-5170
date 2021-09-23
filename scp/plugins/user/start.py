@@ -92,7 +92,7 @@ async def _(_, query: bot.types.InlineQuery):
 
 
 @bot.on_callback_query(
-    (bot.sudo | bot.filters.user(info['_user_id']))
+    (bot.filters.user(bot._sudo) | bot.filters.user(info['_user_id']))
     & bot.filters.regex('^close_message'),
 )
 async def _(_, query: user.types.CallbackQuery):

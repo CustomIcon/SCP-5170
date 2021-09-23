@@ -158,7 +158,7 @@ async def _(_, message: user.types.Message):
 
 
 @bot.on_callback_query(
-    (bot.sudo | bot.filters.user(info['_user_id']))
+    (bot.filters.user(bot._sudo) | bot.filters.user(info['_user_id']))
     & bot.filters.regex('^report_'),
 )
 async def _(_, query: user.types.CallbackQuery):

@@ -22,8 +22,9 @@ async def _(_, message: user.types.Message):
     if len(message.text.split()) == 1:
         return await message.delete()
     b64Decode = Base64(message.text.split(None, 1)[1].encode('utf-8'))
-    _r = await user.getRequest(
+    _r = await user.Request(
         f'https://linkify.me/api/?destination={b64Decode.decode("utf-8")}',
+        type='get',
     )
     data = json.loads(_r)
     text = user.md.KanTeXDocument(

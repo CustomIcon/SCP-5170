@@ -24,8 +24,9 @@ __DOC__ = str(
 async def _(_, message: user.types.Message):
     f = await message.reply_to_message.download()
     r = await message.reply('**Uploading**', quote=True)
-    out = await user.postRequest(
+    out = await user.Request(
         'https://api.anonfiles.com/upload',
+        type='post',
         data={'file': open(f, 'rb')},
     )
     os.remove(f)

@@ -45,10 +45,11 @@ async def genTime(
     to_find: str,
     findtype: List[str]
 ) -> str:
-    data = await user.getRequest(
+    data = await user.Request(
         'https://api.timezonedb.com/v2.1/list-time-zone?'
         'key=XWSLLPX5RMIZ&format=json&'
         'fields=countryCode,countryName,zoneName,gmtOffset,timestamp,dst',
+        type='get',
     )
     for zone in data['zones']:
         for eachtype in findtype:

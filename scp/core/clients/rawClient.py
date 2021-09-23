@@ -7,10 +7,10 @@ import asyncio
 import logging
 
 
-class User(Client):
+class client(Client):
     def __init__(
         self,
-        name: str = 'scp-user',
+        name: str,
         aioclient=ClientSession,
     ):
         self.name = name
@@ -22,11 +22,11 @@ class User(Client):
 
     async def start(self):
         await super().start()
-        logging.warning('`User.Client` started.')
+        logging.warning(__name__ + ' started.')
 
     async def stop(self, *args):
         await super().stop()
-        logging.warning('`Use.Client` started.')
+        logging.warning(__name__ + ' stopped.')
 
     def command(self, *args, **kwargs):
         return command(*args, **kwargs)
@@ -67,34 +67,21 @@ class User(Client):
             e = await response.text()
         return e if e != 'false' and e[:-1] != url else None
 
-    async def getRequest(self, url: str):
-        async with self.aioclient.get(url) as resp:
-            try:
-                return await resp.json()
-            except client_exceptions.ContentTypeError:
-                return (await resp.read()).decode('utf-8')
-
-    async def postRequest(
-        self,
-        *args,
-        **kwargs
-    ):
-        async with self.aioclient.post(*args, **kwargs) as resp:
-            try:
-                return await resp.json()
-            except client_exceptions.ContentTypeError:
-                return (await resp.read()).decode('utf-8')
-
-    async def putRequest(
-        self,
-        *args,
-        **kwargs
-    ):
-        async with self.aioclient.put(*args, **kwargs) as resp:
-            try:
-                return await resp.json()
-            except client_exceptions.ContentTypeError:
-                return (await resp.read()).decode('utf-8')
+    async def Request(self, url: str, type: str, *args, **kwargs):
+        if type == 'get':
+            resp = await self.aioclient.get(url, *args, **kwargs)
+        elif type == 'post':
+            resp = await self.aioclient.post(url, *args, **kwargs)
+        elif type == 'put':
+            resp = await self.aioclient.put(url, *args, **kwargs)
+        try:
+            await self.aioclient.close()
+        except RuntimeError:
+            ...
+        try:
+            return await resp.json()
+        except client_exceptions.ContentTypeError:
+            return (await resp.read()).decode('utf-8')
 
     async def netcat(self, host: str, port: int, content: str):
         reader, writer = await asyncio.open_connection(

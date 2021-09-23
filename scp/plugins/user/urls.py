@@ -45,7 +45,7 @@ async def _(_, message: user.types.Message):
     doc = user.md.KanTeXDocument()
     sec = user.md.Section(f'IP-info: `{query}`')
     for key, value in (
-        await user.getRequest('http://ip-api.com/json/' + query)
+        await user.Request('http://ip-api.com/json/' + query, type='get')
     ).items():
         sec.append(
             user.md.KeyValueItem(

@@ -19,10 +19,11 @@ __DOC__ = str(
 async def _(_, message: user.types.Message):
     if len(message.text.split()) == 1:
         return await message.delete()
-    resp = await user.getRequest(
+    resp = await user.Request(
         'https://phonevalidation.abstractapi.com/v1/'
         '?api_key=9d5acbb007c74165b9702ec4a7246e81&'
         f'phone={message.text.split(None, 1)[1]}',
+        type='get',
     )
     doc = user.md.KanTeXDocument()
     sec = user.md.Section('PhoneValidation:')

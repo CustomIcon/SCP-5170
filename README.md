@@ -34,12 +34,9 @@ therefore a plugin can be very simple to make and import into `scp/plugins/priva
 ```
 scp.bot - bot client
 scp.user - user client
-scp.user.filters - pyrogram filters (for user client)
-scp.bot.filters - pyrogram filters (for bot client)
-scp.user.sudo - a filter with sudoers added
-scp.bot.sudo - a different filter without pyrogram's filters.me for the bot client
-scp.user.command - command filter for user
-scp.bot.command - command filter for bot
+client.filters - pyrogram filters (for user client)
+client.sudo - a filter with sudoers added
+client.command - command filter with '(*prefix)command@username'
 ```
 
  - an Example plugin the echo to a command with `(*prefix)hello`:

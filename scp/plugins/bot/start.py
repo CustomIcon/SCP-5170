@@ -3,7 +3,7 @@ from scp.utils.selfInfo import info
 
 
 @bot.on_message(
-    (bot.sudo | bot.filters.user(info['_user_id']))
+    (bot.filters.user(bot._sudo) | bot.filters.user(info['_user_id']))
     & bot.command('start', prefixes='/'),
 )
 async def _(_, message: bot.types.Message):

@@ -182,7 +182,7 @@ async def _(_, query: bot.types.InlineQuery):
 
 
 @bot.on_callback_query(
-    (bot.sudo | bot.filters.user(info['_user_id']))
+    (bot.filters.user(bot._sudo) | bot.filters.user(info['_user_id']))
     & bot.filters.regex('^cperm_'),
 )
 async def _(_, query: user.types.CallbackQuery):
@@ -194,7 +194,7 @@ async def _(_, query: user.types.CallbackQuery):
 
 
 @bot.on_callback_query(
-    (bot.sudo | bot.filters.user(info['_user_id']))
+    (bot.filters.user(bot._sudo) | bot.filters.user(info['_user_id']))
     & bot.filters.regex('^cdesc_'),
 )
 async def _(_, query: user.types.CallbackQuery):
