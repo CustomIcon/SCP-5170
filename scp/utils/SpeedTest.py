@@ -388,10 +388,7 @@ if HTTPSConnection:
             try:
                 kwargs = {}
                 if hasattr(ssl, 'SSLContext'):
-                    if self._tunnel_host:
-                        kwargs['server_hostname'] = self._tunnel_host
-                    else:
-                        kwargs['server_hostname'] = self.host
+                    kwargs['server_hostname'] = self._tunnel_host or self.host
                 self.sock = self._context.wrap_socket(self.sock, **kwargs)
             except AttributeError:
                 self.sock = ssl.wrap_socket(self.sock)

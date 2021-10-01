@@ -22,11 +22,15 @@ class client(Client):
 
     async def start(self):
         await super().start()
-        logging.warning(__name__ + ' started.')
+        logging.warning(
+            f'logged in as {(await super().get_me()).first_name}.',
+        )
 
     async def stop(self, *args):
         await super().stop()
-        logging.warning(__name__ + ' stopped.')
+        logging.warning(
+            f'logged out from {(await super().get_me()).first_name}.',
+        )
 
     def command(self, *args, **kwargs):
         return command(*args, **kwargs)
