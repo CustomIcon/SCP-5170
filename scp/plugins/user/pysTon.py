@@ -1,4 +1,3 @@
-from asyncio import exceptions
 from pyston import PystonClient, exceptions
 import os
 from scp import user
@@ -14,7 +13,9 @@ __DOC__ = str(
             'Execute code in a safer Environment',
             user.md.SubSection(
                 'Execute',
-                user.md.Code('(*prefix)exec {language} {code_or_scriptDocument}'),
+                user.md.Code(
+                    '(*prefix)exec {language} {code_or_Document}',
+                ),
             ),
             user.md.SubSection(
                 'get supported Languages',
@@ -23,7 +24,6 @@ __DOC__ = str(
         ),
     ),
 )
-
 
 
 @user.on_message(
@@ -61,32 +61,38 @@ async def _(_, message: user.types.Message):
     end = time.time()
     await client.close_session()
     return await message.reply(
-        user.md.Section('Evaluation',
+        user.md.Section(
+            'Evaluation',
             user.md.SubSection(
                 'Output',
-                user.md.Code(output)
+                user.md.Code(output),
             ),
             user.md.SubSection(
                 'Language',
-                user.md.Code(language)
+                user.md.Code(language),
             ),
             user.md.SubSection(
                 'TimeTaken',
-                user.md.Code(HumanizeTime(end - start))
+                user.md.Code(HumanizeTime(end - start)),
             ),
-            
+
         ),
-        quote=True
+        quote=True,
     )
+
 
 @user.on_message(
     user.sudo
-    & user.command('execLang')
+    & user.command('execLang'),
 )
 async def _(_, message: user.types.Message):
     client = PystonClient()
     sec = user.md.Section('Languages')
     for language in await client.get_runtimes(formatted=False):
-        sec.append(user.md.KeyValueItem(language['language'], language['version']))
+        sec.append(
+            user.md.KeyValueItem(
+                language['language'], language['version'],
+            ),
+        )
     await client.close_session()
     return await message.reply(sec, quote=True)
