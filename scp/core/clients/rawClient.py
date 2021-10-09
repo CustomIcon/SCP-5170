@@ -79,10 +79,6 @@ class client(Client):
         elif type == 'put':
             resp = await self.aioclient.put(url, *args, **kwargs)
         try:
-            await self.aioclient.close()
-        except RuntimeError:
-            ...
-        try:
             return await resp.json()
         except client_exceptions.ContentTypeError:
             return (await resp.read()).decode('utf-8')
