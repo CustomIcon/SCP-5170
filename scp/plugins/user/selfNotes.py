@@ -2,7 +2,6 @@ from scp import user
 from scp.database.tables.notes import Notes
 
 
-
 @user.on_message(user.filters.me & user.command('notes'))
 async def _(_, message: user.types.Message):
     data = await Notes().load()
@@ -24,9 +23,9 @@ async def _(_, message: user.types.Message):
         user.md.KanTeXDocument(
             user.md.Section(
                 'Note Saved.',
-                user.md.Code(f'Note Added "{args[1]}"')
-            )
-        )
+                user.md.Code(f'Note Added "{args[1]}"'),
+            ),
+        ),
     )
 
 
@@ -43,7 +42,7 @@ async def _(_, message: user.types.Message):
         else:
             sec = user.md.Section(
                 'Error',
-                user.md.Code('Cannot find the note')
+                user.md.Code('Cannot find the note'),
             )
     doc.append(sec)
     return await message.reply(doc)
@@ -59,15 +58,15 @@ async def _(_, message: user.types.Message):
             user.md.KanTeXDocument(
                 user.md.Section(
                     'Note Deleted,',
-                    user.md.Code(f'Note "{message.command[1]}" deleted.')
-                )
-            )
+                    user.md.Code(f'Note "{message.command[1]}" deleted.'),
+                ),
+            ),
         )
     return await message.reply(
         user.md.KanTeXDocument(
             user.md.Section(
                 'Error',
-                user.md.Code('Cannot find the note')
-            )
-        )
+                user.md.Code('Cannot find the note'),
+            ),
+        ),
     )

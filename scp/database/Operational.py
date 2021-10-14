@@ -6,18 +6,18 @@ async def InitializeDatabase():
     try:
         user._config.getint(
             '.internal',
-            'databaseChannel'
+            'databaseChannel',
         )
     except configparser.NoSectionError:
         with open('config.ini', 'w') as file:
             user._config.add_section('.internal')
             channel = await user.create_channel(
                 'scp-Database',
-                description='Do not play with this channel!'
+                description='Do not play with this channel!',
             )
             user._config.set(
                 '.internal',
                 'databaseChannel',
-                str(channel.id)
+                str(channel.id),
             )
             user._config.write(file)

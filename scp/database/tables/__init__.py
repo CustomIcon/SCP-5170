@@ -1,6 +1,5 @@
 import configparser
 from scp import user
-import ujson as json
 
 
 async def checkTable(name: str):
@@ -10,19 +9,16 @@ async def checkTable(name: str):
         table = await user.send_message(
             user._config.getint(
                 '.internal',
-                'databaseChannel'
+                'databaseChannel',
             ),
-            "{}"
+            '{}',
         )
         user._config.set(
             '.internal',
             name,
-            str(table.message_id)
+            str(table.message_id),
         )
         with open('config.ini', 'w') as file:
             user._config.write(file)
         tableID = table.message_id
     return tableID
-
-
-
