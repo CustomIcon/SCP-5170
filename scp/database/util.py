@@ -1,6 +1,5 @@
 class Temp:
     unallowed = [int, float]
-
     def __init__(
         self,
         schema=None,

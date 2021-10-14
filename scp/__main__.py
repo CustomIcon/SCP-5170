@@ -8,6 +8,7 @@ from scp.core.functions.plugins import (
 )
 from scp.utils.selfInfo import updateInfo
 from scp.utils.interpreter import shell
+from scp.database.Operational import InitializeDatabase
 
 
 HELP_COMMANDS = {}
@@ -19,6 +20,7 @@ async def start_bot():
     await bot.start()
     await user.start()
     await updateInfo()
+    await InitializeDatabase()
     asyncio.create_task(shell())
     await asyncio.gather(
         loadBotPlugins(),
