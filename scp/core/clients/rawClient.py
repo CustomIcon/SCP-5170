@@ -98,6 +98,7 @@ class client(Client):
     raw = raw
     types = types
     md = Markdown
+    exceptions = errors
     _config = ConfigParser()
     _config.read('config.ini')
     _sudo = []

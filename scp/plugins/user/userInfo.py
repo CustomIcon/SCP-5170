@@ -1,8 +1,6 @@
 from scp import user, bot
 from scp.utils.selfInfo import info
 from scp.utils.strUtils import name_check, permissionParser
-from pyrogram import errors
-
 
 __PLUGIN__ = 'UserInfo'
 __DOC__ = str(
@@ -44,8 +42,8 @@ async def _(_, message: user.types.Message):
             '_userInfo ' + str(Uid),
         )
     except (
-        errors.exceptions.bad_request_400.PeerIdInvalid,
-        errors.exceptions.bad_request_400.BotResponseTimeout,
+        user.exceptions.PeerIdInvalid,
+        user.exceptions.BotResponseTimeout,
     ) as err:
         return await message.reply(err, quote=True)
     for m in x.results:
@@ -66,7 +64,7 @@ async def _(_, query: bot.types.InlineQuery):
         return None
     try:
         u = await user.get_users(get_user)
-    except errors.exceptions.bad_request_400.PeerIdInvalid:
+    except user.exceptions.PeerIdInvalid:
         return None
     except IndexError:
         u = await user.get_chat(get_user)
@@ -78,7 +76,7 @@ async def _(_, query: bot.types.InlineQuery):
                 ),
             )
         ).onlines
-    except errors.exceptions.bad_request_400.PeerIdInvalid:
+    except user.exceptions.PeerIdInvalid:
         onlines = 0
     if isinstance(u, user.types.Chat):
         text = user.md.Section(

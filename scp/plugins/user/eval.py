@@ -8,7 +8,6 @@ import asyncio
 from shortuuid import ShortUUID
 from io import StringIO, BytesIO
 from scp import user, bot
-from pyrogram import errors
 from scp.utils.selfInfo import info
 from scp.utils.parser import getMediaAttr
 
@@ -127,8 +126,8 @@ async def listexec(_, message: user.types.Message):
             '_listEval',
         )
     except (
-        errors.exceptions.bad_request_400.PeerIdInvalid,
-        errors.exceptions.bad_request_400.BotResponseTimeout,
+        user.exceptions.PeerIdInvalid,
+        user.exceptions.BotResponseTimeout,
     ):
         return await message.reply('no tasks', quote=True)
     for m in x.results:

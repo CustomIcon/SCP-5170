@@ -10,7 +10,7 @@ async def _(_, message: user.types.Message):
     for key, _ in data.items():
         sec.append(user.md.Code(key))
     doc.append(sec)
-    return await message.reply(doc)
+    return await message.reply(doc, quote=True)
 
 
 @user.on_message(user.filters.me & user.command('addNote'))
@@ -26,6 +26,7 @@ async def _(_, message: user.types.Message):
                 user.md.Code(f'Note Added "{args[1]}"'),
             ),
         ),
+        quote=True
     )
 
 
@@ -38,14 +39,14 @@ async def _(_, message: user.types.Message):
             sec = user.md.Section(key)
             sec.append(user.md.Code(value))
             doc.append(sec)
-            return await message.reply(doc)
+            return await message.reply(doc, quote=True)
         else:
             sec = user.md.Section(
                 'Error',
                 user.md.Code('Cannot find the note'),
             )
     doc.append(sec)
-    return await message.reply(doc)
+    return await message.reply(doc, quote=True)
 
 
 @user.on_message(user.filters.me & user.command('deleteNote'))
@@ -61,6 +62,7 @@ async def _(_, message: user.types.Message):
                     user.md.Code(f'Note "{message.command[1]}" deleted.'),
                 ),
             ),
+            quote=True
         )
     return await message.reply(
         user.md.KanTeXDocument(
@@ -69,4 +71,5 @@ async def _(_, message: user.types.Message):
                 user.md.Code('Cannot find the note'),
             ),
         ),
+        quote=True
     )

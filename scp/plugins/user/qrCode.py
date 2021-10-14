@@ -2,7 +2,6 @@ from scp import user
 from pyzxing import BarCodeReader
 from io import BytesIO
 import os
-from pyrogram import errors
 
 
 __PLUGIN__ = 'qrCode'
@@ -96,7 +95,7 @@ async def _(_, message: user.types.Message):
     doc.append(sec)
     try:
         await message.reply(doc, quote=True)
-    except errors.exceptions.bad_request_400.MessageTooLong:
+    except user.exceptions.MessageTooLong:
         data = BytesIO(str(out).encode())
         data.name = 'qrRead.txt'
         await message.reply_document(
