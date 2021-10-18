@@ -26,7 +26,7 @@ async def _(_, message: user.types.Message):
                 user.md.Code(f'Note Added "{args[1]}"'),
             ),
         ),
-        quote=True
+        quote=True,
     )
 
 
@@ -62,7 +62,7 @@ async def _(_, message: user.types.Message):
                     user.md.Code(f'Note "{message.command[1]}" deleted.'),
                 ),
             ),
-            quote=True
+            quote=True,
         )
     return await message.reply(
         user.md.KanTeXDocument(
@@ -71,5 +71,5 @@ async def _(_, message: user.types.Message):
                 user.md.Code('Cannot find the note'),
             ),
         ),
-        quote=True
+        quote=True,
     )
