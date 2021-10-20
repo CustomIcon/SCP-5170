@@ -3,6 +3,7 @@ import importlib
 from scp import bot, user
 from scp.plugins.bot import ALL_SETTINGS
 from scp.plugins.user import ALL_MODULES
+from .plugins import loadPrivatePlugins
 import asyncio
 
 
@@ -36,7 +37,10 @@ async def reboot():
     global BOT_RUNTIME, HELP_COMMANDS
     importlib.reload(importlib.import_module('scp.plugins.user'))
     importlib.reload(importlib.import_module('scp.plugins.bot'))
-    await asyncio.gather(bot.restart(), user.restart(), reinitial_restart())
+    importlib.reload(importlib.import_module('scp.plugins.private'))
+    await bot.restart()
+    await bot.restart()
+    await reinitial_restart()
     BOT_RUNTIME = 0
     HELP_COMMANDS = {}
     # Assistant bot
@@ -67,3 +71,4 @@ async def reboot():
         if hasattr(imported_module, '__DOC__') and imported_module.__DOC__:
             HELP_COMMANDS[imported_module.__PLUGIN__.lower()] = imported_module
         importlib.reload(imported_module)
+        await loadPrivatePlugins()

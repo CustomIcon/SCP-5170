@@ -27,10 +27,10 @@ class client(Client):
         )
 
     async def stop(self, *args):
-        await super().stop()
         logging.warning(
             f'logged out from {(await super().get_me()).first_name}.',
         )
+        await super().stop()
 
     def command(self, *args, **kwargs):
         return command(*args, **kwargs)
@@ -83,7 +83,12 @@ class client(Client):
         except client_exceptions.ContentTypeError:
             return (await resp.read()).decode('utf-8')
 
-    async def netcat(self, host: str, port: int, content: str):
+    async def netcat(
+        self,
+        host: str,
+        port: int,
+        content: str
+    ):
         reader, writer = await asyncio.open_connection(
             host, port,
         )

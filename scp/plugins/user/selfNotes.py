@@ -2,6 +2,32 @@ from scp import user
 from scp.database.tables.notes import Notes
 
 
+__PLUGIN__ = 'notes'
+__DOC__ = str(
+    user.md.KanTeXDocument(
+        user.md.Section(
+            'Notes',
+            user.md.SubSection(
+                'get all notes',
+                user.md.Code('(*prefix)notes'),
+            ),
+            user.md.SubSection(
+                'get a note',
+                user.md.Code('(*prefix)getNote {key}'),
+            ),
+            user.md.SubSection(
+                'add a note',
+                user.md.Code('(*prefix)addNote {key} {value}'),
+            ),
+            user.md.SubSection(
+                'delete a note',
+                user.md.Code('(*prefix)deleteNote {key}'),
+            ),
+        ),
+    ),
+)
+
+
 @user.on_message(user.filters.me & user.command('notes'))
 async def _(_, message: user.types.Message):
     data = await Notes().load()
