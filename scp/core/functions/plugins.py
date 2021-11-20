@@ -4,6 +4,9 @@ from scp.plugins.user import ALL_MODULES
 from os.path import dirname, basename, isfile
 import glob
 from pathlib import Path
+import logging
+
+logging.getLogger(__name__)
 
 
 HELP_COMMANDS = {}
@@ -14,6 +17,7 @@ async def loadBotPlugins():
         importlib.import_module(
             'scp.plugins.bot.' + setting,
         )
+    logging.info(f'imported {len(ALL_SETTINGS)} bot modules')
 
 
 async def loadUserPlugins():
@@ -38,6 +42,7 @@ async def loadUserPlugins():
                 )
         if hasattr(imported_module, '__DOC__') and imported_module.__DOC__:
             HELP_COMMANDS[imported_module.__PLUGIN__.lower()] = imported_module
+    logging.info(f'imported {len(HELP_COMMANDS)} user modules')
 
 
 async def loadPrivatePlugins():

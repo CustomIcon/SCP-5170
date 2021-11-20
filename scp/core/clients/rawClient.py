@@ -17,6 +17,7 @@ class client(Client):
         super().__init__(
             name,
             workers=8,
+            config_file='config.ini',
         )
         self.aioclient = aioclient()
 
