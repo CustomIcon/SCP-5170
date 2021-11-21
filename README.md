@@ -16,7 +16,7 @@
 
 ### Requirements
  - a brain
- - python>=3.8
+ - python>=3.10
 
 ### Setup
  - clone this repository with `git clone` with `--recrusive` flag and change directory to the root of the project
@@ -40,16 +40,27 @@ client.command - command filter with '(*prefix)command@username'
 ```
 
  - an Example plugin the echo to a command with `(*prefix)hello`:
+
+#### python
 ```
 from scp import user
 
 @user.on_message(
     user.sudo
     & user.command('hello')
-    & user.filters.text
 )
 async def _(_, message: types.Message):
     await message.reply('hello')
+```
+
+#### hy
+```
+(import [scp[user]])
+
+(with-decorator (
+    user.on_message (user.command "hello"))
+    (defn/a _ [_ message]
+        (await (message.reply "hello"))))
 ```
 
 ### FAQ
@@ -63,6 +74,7 @@ async def _(_, message: types.Message):
   i always loved it, therefore i did add KanteX to globally use in this userbot
 
 ### Special thancc
+ - [hylang](https://hylang.org) - hy team <3
  - [Dan](https://github.com/delivrance) - pyrogram
  - [Fluffy Shark](https://github.com/ColinShark) - QR Code session generator Script
  - [Kneesocks](https://github.com/the-blank-x) - 13 year old with multiple police records (also eval module is originally by him)

@@ -47,13 +47,17 @@ async def loadUserPlugins():
 
 async def loadPrivatePlugins():
     def __list_all_modules():
-        mod_paths = glob.glob(
+        py_paths = glob.glob(
             dirname(Path(__file__).parent.parent) + '/plugins/private/*.py',
         )
+        hy_paths = glob.glob(
+            dirname(Path(__file__).parent.parent) + '/plugins/private/*.hy',
+        )
+        mod_paths = py_paths + hy_paths
         return [
             basename(f)[:-3]
             for f in mod_paths
-            if isfile(f) and f.endswith('.py')
+            if isfile(f) and f.endswith('.hy') or f.endswith('.py')
         ]
     for modul in sorted(__list_all_modules()):
         imported_module = importlib.import_module(

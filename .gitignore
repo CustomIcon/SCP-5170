@@ -118,5 +118,6 @@ bot.ini
 *.ini
 scp/logs/*.txt
 scp/plugins/private/*.py
+scp/plugins/private/*.hy
 test.py
 unknown_errors.txt
