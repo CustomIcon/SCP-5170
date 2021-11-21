@@ -26,7 +26,7 @@
  - create session for user and bot
    - user: `python -m session -s scp-user`
    - bot : `python -m session -s scp-bot -t {bot_token}`
- - all done. run the userbot with `python -m scp`
+ - all done. run the userbot with `hy -m scp`
 
 ### Creating own modules
 as you know SCP-5170 is using pyrogram and a custom client,

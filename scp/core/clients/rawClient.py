@@ -15,7 +15,7 @@ class client(Client):
     ):
         self.name = name
         super().__init__(
-            name,
+            self.name,
             workers=8,
             config_file='config.ini',
         )

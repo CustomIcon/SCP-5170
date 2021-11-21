@@ -6,7 +6,7 @@
 (import [rich.logging [RichHandler]])
 (import [pyromod [listen]])
 (import [scp.utils.gitTools [getVersion]])
-
+(import pathlib)
 
 (setv RUNTIME (time.time))
 (setv Versions (getVersion))
@@ -29,5 +29,6 @@
 
 (setv log (logging.getLogger))
 (setv loop (asyncio.get_event_loop))
-(setv bot (client "scp-bot"))
-(setv user (client "scp-user"))
+(setv _path (pathlib.Path __file__))
+(setv bot (client f"{(_path.parent.resolve)}-bot"))
+(setv user (client f"{(_path.parent.resolve)}-user"))
