@@ -1,4 +1,4 @@
-from pyrogram import Client, filters, types, raw, errors, session
+from pyrogram import Client, filters, types, raw, errors, session, handlers
 from scp.core.filters.Command import command
 from configparser import ConfigParser
 from kantex import md as Markdown
@@ -103,6 +103,7 @@ class client(Client):
     filters = filters
     raw = raw
     types = types
+    handlers = handlers
     md = Markdown
     exceptions = errors
     _config = ConfigParser()

@@ -3,7 +3,7 @@
 
 
 (with-decorator (
-    bot.on_message [(bot.filters.user bot._sudo) | (bot.filters.user (info.get "_user_id")) & (bot.command "start" :prefixes "/")])
+    bot.on_message :filters (bot.command "start" :prefixes "/"))
     (defn/a _ [_ message]
         (setv text
             (user.md.KanTeXDocument
