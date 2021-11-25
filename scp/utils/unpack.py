@@ -13,7 +13,7 @@ def unpackInlineMessage(inline_message_id: str):
     )
     temp['dc_id'] = dc_id
     temp['message_id'] = message_id
-    temp['chat_id'] = int(str(chat_id).replace('-1', '-100'))
+    temp['chat_id'] = int(str(chat_id).replace('-1', '-1001'))
     temp['query_id'] = query_id
     temp['inline_message_id'] = inline_message_id
     return Atr(temp)

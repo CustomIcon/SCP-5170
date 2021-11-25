@@ -98,6 +98,6 @@ async def _(_, query: bot.types.InlineQuery):
 async def _(_, query: user.types.CallbackQuery):
     unPacked = unpackInlineMessage(query.inline_message_id)
     await user.delete_messages(
-        chat_id=unPacked.chat_id,
+	chat_id=unPacked.chat_id,
         message_ids=unPacked.message_id,
     )
