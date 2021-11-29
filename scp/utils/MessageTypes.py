@@ -3,7 +3,6 @@ from scp import user
 from scp.utils.parser import getAttr
 
 
-
 @unique
 class Types(IntEnum):
     TEXT = 0
