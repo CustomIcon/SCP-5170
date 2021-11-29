@@ -9,7 +9,7 @@ from shortuuid import ShortUUID
 from io import StringIO, BytesIO
 from scp import user, bot
 from scp.utils.selfInfo import info
-from scp.utils.parser import getMediaAttr
+from scp.utils.parser import getAttr
 
 exec_tasks = {}
 
@@ -209,7 +209,7 @@ async def cancelexec(_, query: user.types.CallbackQuery):
 )
 async def _(_, message: user.types.Message):
     message = message.reply_to_message or message
-    media = getMediaAttr(
+    media = getAttr(
         message,
         [
             'audio',

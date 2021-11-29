@@ -15,8 +15,8 @@
     (await (updateInfo))
     (await (InitializeDatabase))
     (await (
-        asyncio.gather 
-            (asyncio.create_task 
+        asyncio.gather
+            (asyncio.create_task
                 (shell))
             (loadBotPlugins)
             (loadUserPlugins)
@@ -26,4 +26,3 @@
 )
 
 (loop.run_until_complete (main))
-

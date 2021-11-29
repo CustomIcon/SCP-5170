@@ -3,6 +3,7 @@ import time
 from scp.utils.parser import HumanizeTime
 from scp.utils.selfInfo import info
 from scp.utils.unpack import unpackInlineMessage
+from scp.utils.cache import Messages
 
 
 @user.on_message(
@@ -63,6 +64,10 @@ async def _(_, query: bot.types.InlineQuery):
                     user.md.Bold('scp_uptime'),
                     user.md.Code(HumanizeTime(time.time() - RUNTIME)),
                 ),
+                user.md.KeyValueItem(
+                    user.md.Bold('message_recieved'),
+                    user.md.Code(str(len(Messages))),
+                ),
             ),
         ),
     )
@@ -98,6 +103,6 @@ async def _(_, query: bot.types.InlineQuery):
 async def _(_, query: user.types.CallbackQuery):
     unPacked = unpackInlineMessage(query.inline_message_id)
     await user.delete_messages(
-	chat_id=unPacked.chat_id,
+        chat_id=unPacked.chat_id,
         message_ids=unPacked.message_id,
     )

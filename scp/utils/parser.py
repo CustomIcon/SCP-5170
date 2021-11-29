@@ -27,7 +27,7 @@ def HumanizeTime(seconds: int) -> str:
     return ping_time
 
 
-def getMediaAttr(
+def getAttr(
     message: types.Message,
     Attr: list,
 ):
