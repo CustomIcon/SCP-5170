@@ -37,7 +37,7 @@ def command(
         regex = r'(?i)^({prefix})({regex})(@{bot_name})?(\s.*)?$'.format(
             prefix='|'.join(re.escape(x) for x in flt.prefixes),
             regex='|'.join(flt.commands),
-            bot_name=info['_user_username'].lower(),
+            bot_name=info['_user_username'].lower() if info['_user_username'] else '',
         )
         if matches := re.search(regex, text, flags=re.IGNORECASE):
             message.command = [matches.group(2)]
