@@ -94,7 +94,7 @@ async def _(_, messages: List):
                         caption=text,
                     )
                 elif dataType == Types.PHOTO:
-                    await SendType['Document'](
+                    await SendType['Photo'](
                         user.log_channel,
                         content,
                         caption=text,
