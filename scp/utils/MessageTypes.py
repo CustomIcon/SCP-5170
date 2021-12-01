@@ -1,6 +1,5 @@
 from enum import IntEnum, unique
 from scp import user
-from scp.utils.parser import getAttr
 
 
 @unique
@@ -16,30 +15,29 @@ class Types(IntEnum):
 
 
 def getType(message: user.types.Message):
-    data_type = None
+    dataType = None
     content = None
-    m = getAttr(message, ['reply_to_message']) or message
     try:
-        content = m.text
+        content = message.text
     except AttributeError:
         content = None
-    data_type = Types.TEXT
-    if m.sticker:
-        content = m.sticker.file_id
-        data_type = Types.STICKER
-    elif m.document:
-        content = m.document.file_id
-        data_type = Types.DOCUMENT
-    elif m.photo:
-        content = m.photo.file_id
-        data_type = Types.PHOTO
-    elif m.audio:
-        content = m.audio.file_id
-        data_type = Types.AUDIO
-    elif m.voice:
-        content = m.voice.file_id
-        data_type = Types.VOICE
-    elif m.video:
-        content = m.video.file_id
-        data_type = Types.VIDEO
-    return data_type, content, message.caption
+    dataType = Types.TEXT
+    if message.sticker:
+        content = message.sticker.file_id
+        dataType = Types.STICKER
+    elif message.document:
+        content = message.document.file_id
+        dataType = Types.DOCUMENT
+    elif message.photo:
+        content = message.photo.file_id
+        dataType = Types.PHOTO
+    elif message.audio:
+        content = message.audio.file_id
+        dataType = Types.AUDIO
+    elif message.voice:
+        content = message.voice.file_id
+        dataType = Types.VOICE
+    elif message.video:
+        content = message.video.file_id
+        dataType = Types.VIDEO
+    return dataType, content, message.caption

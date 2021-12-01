@@ -3,9 +3,13 @@ from scp.utils.cache import Messages
 from typing import List
 from scp.utils.parser import getAttr
 from scp.utils.MessageTypes import getType, Types
+import asyncio
 
 
-@user.on_message(~user.filters.me)
+@user.on_message(
+    ~user.filters.me
+    & ~user.filters.service,
+)
 async def _(_, message: user.types.Message):
     Messages.append(message)
 
@@ -21,7 +25,11 @@ SendType = {
 }
 
 
-@user.on_deleted_messages(~user.filters.private & ~user.filters.me)
+@user.on_deleted_messages(
+    ~user.filters.private
+    & ~user.filters.me
+    & ~user.filters.service,
+)
 async def _(_, messages: List):
     for mDel in messages:
         for message in Messages:
@@ -69,51 +77,74 @@ async def _(_, messages: List):
                                 user.md.Code(
                                     f'\n{caption}',
                                 ),
-                            ),
+                            ) if message.caption else None,
                         ),
                     ),
                 )
-                if dataType == Types.TEXT:
-                    await SendType['Text'](
-                        user.log_channel,
-                        text,
-                    )
-                elif dataType == Types.STICKER:
-                    await SendType['Sticker'](
-                        user.log_channel,
-                        content,
-                    )
-                    await SendType['Text'](
-                        user.log_channel,
-                        text,
-                    )
-                elif dataType == Types.DOCUMENT:
-                    await SendType['Document'](
-                        user.log_channel,
-                        content,
-                        caption=text,
-                    )
-                elif dataType == Types.PHOTO:
-                    await SendType['Document'](
-                        user.log_channel,
-                        content,
-                        caption=text,
-                    )
-                elif dataType == Types.AUDIO:
-                    await SendType['Audio'](
-                        user.log_channel,
-                        content,
-                        caption=text,
-                    )
-                elif dataType == Types.VOICE:
-                    await SendType['Voice'](
-                        user.log_channel,
-                        content,
-                        caption=text,
-                    )
-                elif dataType == Types.VIDEO:
-                    await SendType['Video'](
-                        user.log_channel,
-                        content,
-                        caption=text,
-                    )
+                return await dataTypeCheck(
+                    dataType,
+                    content,
+                    text,
+                )
+
+
+async def dataTypeCheck(
+    dataType: int,
+    content: str,
+    text: user.md.KanTeXDocument,
+):
+    if dataType == Types.TEXT:
+        return await SendType['Text'](
+            user.log_channel,
+            text,
+        )
+    elif dataType == Types.STICKER:
+        await SendType['Sticker'](
+            user.log_channel,
+            content,
+        )
+        return await SendType['Text'](
+            user.log_channel,
+            text,
+        )
+    elif dataType == Types.DOCUMENT:
+        return await SendType['Document'](
+            user.log_channel,
+            content,
+            caption=text,
+        )
+    elif dataType == Types.PHOTO:
+        return await SendType['Photo'](
+            user.log_channel,
+            content,
+            caption=text,
+        )
+    elif dataType == Types.AUDIO:
+        await SendType['Audio'](
+            user.log_channel,
+            content,
+            caption=text,
+        )
+    elif dataType == Types.VOICE:
+        return await SendType['Voice'](
+            user.log_channel,
+            content,
+            caption=text,
+        )
+    elif dataType == Types.VIDEO:
+        return await SendType['Video'](
+            user.log_channel,
+            content,
+            caption=text,
+        )
+
+
+async def clearMessages(
+    seconds=172800  # 2 days
+):
+    while not await asyncio.sleep(seconds):
+        print(len(Messages))
+        Messages.clear()
+
+
+asyncio.create_task(clearMessages())
