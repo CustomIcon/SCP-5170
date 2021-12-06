@@ -1,4 +1,5 @@
 (import logging)
+(import hy) ; noqa
 (import asyncio)
 (import sys)
 (import time)
