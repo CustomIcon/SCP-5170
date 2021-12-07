@@ -1,6 +1,7 @@
 from scp import user, bot
 from scp.utils.selfInfo import info
-from scp.utils.strUtils import name_check, permissionParser
+from scp.utils.strUtils import name_check
+from scp.utils.parser import permissionParser
 
 __PLUGIN__ = 'UserInfo'
 __DOC__ = str(

@@ -53,6 +53,7 @@ class client(Client):
         except (
             errors.SlowmodeWait,
             errors.FloodWait,
+            errors.exceptions.flood_420.FloodWait,
         ) as e:
             await asyncio.sleep(e.x)
             return await super().send(
