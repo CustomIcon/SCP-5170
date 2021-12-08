@@ -9,7 +9,7 @@ humanize==3.11.0
 hy==1.0a3
 kantex==0.2.0
 psutil==5.8.0
-Pyrogram==1.2.9
+Pyrogram==1.2.19
 pyromod==1.5
 pyzxing==1.0.1
 rich==10.7.0
