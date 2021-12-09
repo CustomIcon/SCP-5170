@@ -1,13 +1,14 @@
 (import asyncio)
 (import [pyrogram[idle]])
 (import [scp[user bot]])
-(import [scp.core.functions.plugins[loadBotPlugins loadUserPlugins loadPrivatePlugins]])
+(import [scp.core.functions.plugins
+    [loadBotPlugins loadUserPlugins loadPrivatePlugins]])
 (import [scp.utils.selfInfo[updateInfo]])
 (import [scp.utils.interpreter[shell]])
 (import [scp.database.Operational[InitializeDatabase]])
 
-(setv HELP_COMMANDS {})
-(setv loop (asyncio.get_event_loop))
+(setv HELP_COMMANDS {}
+    loop (asyncio.get_event_loop))
 
 (defn/a main []
     (await (bot.start))

@@ -7,6 +7,9 @@ import asyncio
 import logging
 
 
+session.Session.notice_displayed = True
+
+
 class client(Client):
     def __init__(
         self,
