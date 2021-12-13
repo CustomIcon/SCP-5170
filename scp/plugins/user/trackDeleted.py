@@ -1,7 +1,7 @@
 from scp import user
 from scp.utils.cache import Messages  # type: ignore
 from typing import List
-from scp.utils.parser.timeUtils import getAttr
+from scp.utils.parser import getAttr
 from scp.utils.MessageTypes import getType, Types  # type: ignore
 import asyncio
 

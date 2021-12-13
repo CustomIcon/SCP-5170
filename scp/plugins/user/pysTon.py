@@ -3,7 +3,7 @@ import os
 from scp import user
 import aiofiles
 import time
-from scp.utils.parser import HumanizeTime
+from scp.utils.parser.timeUtils import HumanizeTime
 
 
 __PLUGIN__ = 'piston'
