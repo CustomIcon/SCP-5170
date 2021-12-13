@@ -1,8 +1,7 @@
 (import asyncio)
 (import [pyrogram[idle]])
 (import [scp[user bot]])
-(import [scp.core.functions.plugins
-    [loadBotPlugins loadUserPlugins loadPrivatePlugins]])
+(import [scp.core.functions.plugins[loadPlugins]])
 (import [scp.utils.selfInfo[updateInfo]])
 (import [scp.utils.interpreter[shell]])
 (import [scp.database.Operational[InitializeDatabase]])
@@ -19,9 +18,9 @@
         asyncio.gather
             (asyncio.create_task
                 (shell))
-            (loadBotPlugins)
-            (loadUserPlugins)
-            (loadPrivatePlugins)
+            (loadPlugins "bot")
+            (loadPlugins "user")
+            (loadPlugins "private")
         )
     )
 )

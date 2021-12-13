@@ -1,7 +1,6 @@
 from scp import user, bot
-from scp.utils.selfInfo import info
-from scp.utils.strUtils import name_check
-from scp.utils.parser import permissionParser
+from scp.utils.selfInfo import info # type: ignore
+from scp.utils.strUtils import name_check, bool_check # type: ignore
 
 __PLUGIN__ = 'UserInfo'
 __DOC__ = str(
@@ -202,3 +201,20 @@ async def _(_, query: user.types.CallbackQuery):
         chat.description[:150] if chat.description else chat.bio,
         show_alert=True,
     )
+
+
+def permissionParser(perms):
+    text = ''
+    text += 'Message: ' + bool_check(perms.can_send_messages) + '\n'
+    text += 'Media: ' + bool_check(perms.can_send_media_messages) + '\n'
+    text += 'Sticker: ' + bool_check(perms.can_send_stickers) + '\n'
+    text += 'GIF: ' + bool_check(perms.can_send_animations) + '\n'
+    text += 'Game: ' + bool_check(perms.can_send_games) + '\n'
+    text += 'Inline: ' + bool_check(perms.can_use_inline_bots) + '\n'
+    text += 'Web: ' + bool_check(perms.can_add_web_page_previews) + '\n'
+    text += 'Poll: ' + bool_check(perms.can_send_polls) + '\n'
+    text += 'Info: ' + bool_check(perms.can_change_info) + '\n'
+    text += 'invite: ' + bool_check(perms.can_invite_users) + '\n'
+    text += 'Pin: ' + bool_check(perms.can_pin_messages) + '\n'
+    return text
+
