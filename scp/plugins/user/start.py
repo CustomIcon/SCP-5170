@@ -1,9 +1,9 @@
 from scp import user, __version__, bot, RUNTIME, __longVersion__
 import time
-from scp.utils.parser import HumanizeTime
-from scp.utils.selfInfo import info
-from scp.utils.unpack import unpackInlineMessage
-from scp.utils.cache import Messages
+from scp.utils.parser.timeUtils import HumanizeTime
+from scp.utils.selfInfo import info  # type: ignore
+from scp.utils.unpack import unpackInlineMessage  # type: ignore
+from scp.utils.cache import Messages  # type: ignore
 
 
 @user.on_message(

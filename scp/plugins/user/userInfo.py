@@ -1,6 +1,6 @@
 from scp import user, bot
-from scp.utils.selfInfo import info # type: ignore
-from scp.utils.strUtils import name_check, bool_check # type: ignore
+from scp.utils.selfInfo import info  # type: ignore
+from scp.utils.strUtils import name_check, bool_check  # type: ignore
 
 __PLUGIN__ = 'UserInfo'
 __DOC__ = str(
@@ -217,4 +217,3 @@ def permissionParser(perms):
     text += 'invite: ' + bool_check(perms.can_invite_users) + '\n'
     text += 'Pin: ' + bool_check(perms.can_pin_messages) + '\n'
     return text
-

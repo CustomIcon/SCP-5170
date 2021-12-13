@@ -8,7 +8,7 @@ import asyncio
 from shortuuid import ShortUUID
 from io import StringIO, BytesIO
 from scp import user, bot
-from scp.utils.selfInfo import info # type: ignore
+from scp.utils.selfInfo import info  # type: ignore
 from scp.utils.parser import getAttr
 
 exec_tasks = {}

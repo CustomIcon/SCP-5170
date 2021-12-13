@@ -7,10 +7,12 @@ logging.getLogger(__name__)
 HELP_COMMANDS = {}
 
 
-async def loadPlugins(pluginDir:str):
+async def loadPlugins(pluginDir: str):
     modules = loadModule(pluginDir)
     for mod in modules:
-        imported_module = importlib.import_module(f'scp.plugins.{pluginDir}.{mod}')
+        imported_module = importlib.import_module(
+            f'scp.plugins.{pluginDir}.{mod}',
+        )
         if hasattr(
             imported_module,
             '__PLUGIN__',

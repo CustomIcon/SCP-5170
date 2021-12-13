@@ -1,3 +1,3 @@
-from .timeUtils import HumanizeTime
-from .token import tokenFetcher # type: ignore
-from .getAttr import getAttr # type: ignore
+from .timeUtils import HumanizeTime  # noqa
+from .token import tokenFetcher  # noqa
+from .getAttr import getAttr  # noqa
