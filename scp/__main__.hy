@@ -18,9 +18,7 @@
         asyncio.gather
             (asyncio.create_task
                 (shell))
-            (loadPlugins "bot")
-            (loadPlugins "user")
-            (loadPlugins "private")
+            (loadPlugins ["bot" "user" "private"])
         )
     )
 )
