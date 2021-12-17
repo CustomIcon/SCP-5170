@@ -18,9 +18,12 @@
         asyncio.gather
             (asyncio.create_task
                 (shell))
-            (loadPlugins ["bot" "user" "private"])
+            (loadPlugins
+                (.split
+                    (user._config.get "scp-5170" "plugins")))
         )
     )
 )
 
-(loop.run_until_complete (main))
+(if (= __name__ "__main__")
+    (loop.run_until_complete (main)))
