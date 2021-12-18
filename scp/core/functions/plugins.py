@@ -32,7 +32,9 @@ async def loadPlugins(pluginDir: str = list):
                         "Can't have two modules with the same name!",
                     )
             if hasattr(imported_module, '__DOC__') and imported_module.__DOC__:
-                HELP_COMMANDS[imported_module.__PLUGIN__.lower()] = imported_module
+                HELP_COMMANDS[
+                    imported_module.__PLUGIN__.lower()
+                ] = imported_module
         return logging.info(f'imported {len(modules)} {pluginDir} modules')
     for plugin in pluginDir:
         modules = loadModule(plugin)
@@ -58,5 +60,7 @@ async def loadPlugins(pluginDir: str = list):
                         "Can't have two modules with the same name!",
                     )
             if hasattr(imported_module, '__DOC__') and imported_module.__DOC__:
-                HELP_COMMANDS[imported_module.__PLUGIN__.lower()] = imported_module
+                HELP_COMMANDS[
+                    imported_module.__PLUGIN__.lower()
+                ] = imported_module
         logging.info(f'imported {len(modules)} {plugin} modules')
