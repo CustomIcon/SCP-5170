@@ -46,25 +46,21 @@ class client(Client):
         timeout: float = session.Session.WAIT_TIMEOUT,
         sleep_threshold: float = None
     ):
-        try:
-            return await super().send(
-                data=data,
-                retries=retries,
-                timeout=timeout,
-                sleep_threshold=sleep_threshold,
-            )
-        except (
-            errors.SlowmodeWait,
-            errors.FloodWait,
-            errors.exceptions.flood_420.FloodWait,
-        ) as e:
-            await asyncio.sleep(e.x)
-            return await super().send(
-                data=data,
-                retries=retries,
-                timeout=timeout,
-                sleep_threshold=sleep_threshold,
-            )
+        while True:
+            try:
+                return await super().send(
+                    data=data,
+                    retries=retries,
+                    timeout=timeout,
+                    sleep_threshold=sleep_threshold,
+                )
+            except (
+                errors.SlowmodeWait,
+                errors.FloodWait,
+            ) as e:
+                await asyncio.sleep(e.x + 2)
+                logging.debug("Sleeping for - " + e.x + " caused by " + e)
+                
 
     # from Kantek
     async def resolve_url(self, url: str) -> str:
