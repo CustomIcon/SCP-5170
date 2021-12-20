@@ -1,4 +1,5 @@
 (import asyncio)
+(require sys)
 (import [pyrogram[idle]])
 (import [scp[user bot]])
 (import [scp.core.functions.plugins[loadPlugins]])
@@ -26,4 +27,7 @@
 )
 
 (if (= __name__ "__main__")
-    (loop.run_until_complete (main)))
+    (try
+        (loop.run_until_complete (main))
+        (except [KeyboardInterrupt]
+            (sys.exit 1))))
