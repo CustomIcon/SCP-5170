@@ -59,7 +59,7 @@ class client(Client):
                 errors.FloodWait,
             ) as e:
                 await asyncio.sleep(e.x + 2)
-                logging.debug("Sleeping for - " + e.x + " caused by " + e)
+                logging.debug("Sleeping for - {e.x} | {e}")
                 
 
     # from Kantek
