@@ -58,9 +58,8 @@ class client(Client):
                 errors.SlowmodeWait,
                 errors.FloodWait,
             ) as e:
+                logging.warning("Sleeping for - " + e.x + " caused by " + e)
                 await asyncio.sleep(e.x + 2)
-                logging.debug("Sleeping for - " + e.x + " caused by " + e)
-                
 
     # from Kantek
     async def resolve_url(self, url: str) -> str:
