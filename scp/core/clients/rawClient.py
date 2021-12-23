@@ -58,7 +58,7 @@ class client(Client):
                 errors.SlowmodeWait,
                 errors.FloodWait,
             ) as e:
-                logging.warning("Sleeping for - " + e.x + " caused by " + e)
+                logging.warning(f"Sleeping for - {e.x} | {e}")
                 await asyncio.sleep(e.x + 2)
 
     # from Kantek
