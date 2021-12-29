@@ -62,10 +62,10 @@ def paginate_modules(page_n, module_dict, prefix, chat=None):
         pairs = pairs[modulo_page * 4: 4 * (modulo_page + 1)] + [
             (
                 _KB(
-                    '◀️', callback_data=f'{prefix}_prev({modulo_page})',
+                    '<', callback_data=f'{prefix}_prev({modulo_page})',
                 ),
                 _KB(
-                    '▶️', callback_data=f'{prefix}_next({modulo_page})',
+                    '>', callback_data=f'{prefix}_next({modulo_page})',
                 ),
             ),
         ]

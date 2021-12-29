@@ -15,23 +15,21 @@ class Notes:
     async def load(
         self
     ):
-        tableID = await checkTable('notes')
         msg = await user.get_messages(
             chat_id=user._config.getint(
                 '.internal',
                 'databasechannel',
             ),
-            message_ids=tableID,
+            message_ids=await checkTable('notes'),
         )
         if msg:
             return json.loads(msg.text)
         return {}
 
     async def dump(self, data: dict):
-        final = json.dumps(data)
-        await user.edit_message_text(
+        return await user.edit_message_text(
             chat_id=user._config.getint('.internal', 'databasechannel'),
             message_id=user._config.getint('.internal', 'notes'),
-            text=f'```{final}```',
+            text=f'```{json.dumps(data)}```',
             parse_mode='markdown',
         )
