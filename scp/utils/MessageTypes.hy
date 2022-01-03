@@ -10,7 +10,8 @@
         PHOTO 4
         AUDIO 5
         VOICE 6
-        VIDEO 7)))
+        VIDEO 7
+        ANIMATION 8)))
 
 
 (defn getType [^user.types.Message message]
@@ -39,4 +40,7 @@
     (if message.video
         (setv content message.video.file_id
             dataType Types.VIDEO))
+    (if message.animation
+        (setv content message.animation.file_id
+            dataType Types.ANIMATION))
     (return (, dataType content message.caption)))
