@@ -58,8 +58,12 @@ class client(Client):
                 errors.SlowmodeWait,
                 errors.FloodWait,
             ) as e:
-                logging.warning(f"Sleeping for - {e.x} | {e}")
+                logging.warning(f'Sleeping for - {e.x} | {e}')
                 await asyncio.sleep(e.x + 2)
+            except TimeoutError:
+                # attempt to fix TimeoutError on slower internet connection
+                await super().disconnect()
+                await super().connect()
 
     # from Kantek
     async def resolve_url(self, url: str) -> str:

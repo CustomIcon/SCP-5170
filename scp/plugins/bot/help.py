@@ -112,7 +112,13 @@ async def help_button(_, query):
             'Document for **{}**:\n'.format(
                 HELP_COMMANDS[module].__PLUGIN__,
             )
-            + HELP_COMMANDS[module].__DOC__
+            + HELP_COMMANDS[module].__DOC__.replace(
+                '(*prefix)',
+                user._config.get(
+                    'scp-5170',
+                    'prefixes',
+                ).split()[0],
+            )
         )
 
         await editMessage(
