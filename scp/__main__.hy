@@ -7,8 +7,7 @@
 (import [scp.utils.interpreter[shell]])
 (import [scp.database.Operational[InitializeDatabase]])
 
-(setv HELP_COMMANDS {}
-    loop (asyncio.get_event_loop))
+;; (setv HELP_COMMANDS {})
 
 (defn/a main []
     (await (bot.start))
@@ -26,8 +25,9 @@
     )
 )
 
+
 (if (= __name__ "__main__")
     (try
-        (loop.run_until_complete (main))
+        (asyncio.run (main))
         (except [KeyboardInterrupt]
             (sys.exit 1))))
