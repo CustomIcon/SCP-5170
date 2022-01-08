@@ -5,6 +5,7 @@ from scp.core.functions.plugins import HELP_COMMANDS
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from scp.utils.misc import paginate_modules
 from scp.utils.selfInfo import info  # type: ignore
+from checksumdir import dirhash
 
 
 async def help_parser(client, chat_id, text, keyboard=None):
@@ -13,6 +14,23 @@ async def help_parser(client, chat_id, text, keyboard=None):
             paginate_modules(0, HELP_COMMANDS, 'help'),
         )
     await client.send_message(chat_id, text, reply_markup=keyboard)
+
+
+@user.on_message(
+    user.sudo &
+    user.command('help'),
+)
+async def _(_, message: user.types.Message):
+    x = await user.get_inline_bot_results(
+        info['_bot_username'],
+        'help',
+    )
+    for m in x.results:
+        await message.reply_inline_bot_result(
+            x.query_id,
+            m.id,
+            quote=True
+        )
 
 
 @bot.on_inline_query(
@@ -29,16 +47,7 @@ async def _(_, query: bot.types.InlineQuery):
         user.types.InlineQueryResultArticle(
             title='help',
             input_message_content=user.types.InputTextMessageContent(
-                user.md.KanTeXDocument(
-                    user.md.Section(
-                        'Help module',
-                        user.md.KeyValueItem(
-                            user.md.Bold(
-                                'Prefixes',
-                            ), user.md.Code(', '.join(prefixes)),
-                        ),
-                    ),
-                ),
+                helpMessage
             ),
             reply_markup=keyboard,
         ),
@@ -96,6 +105,44 @@ async def editMessage(
         )
 
 
+helpMessage = user.md.KanTeXDocument(
+                user.md.Section(
+                    'Help module',
+                    user.md.KeyValueItem(
+                        user.md.Bold('Prefixes'),
+                        user.md.Code(' '.join(prefixes)),
+                    ),
+                    user.md.SubSection(
+                        'checksum(sha256):',
+                        user.md.KeyValueItem(
+                            user.md.Bold('user'),
+                            user.md.Code(
+                                str(
+                                    dirhash(
+                                        'scp/plugins/user',
+                                        'sha256',
+                                        excluded_extensions=['pyc']
+                                    )
+                                )
+                            ),
+                        ),
+                        user.md.KeyValueItem(
+                            user.md.Bold('bot'),
+                            user.md.Code(
+                                str(
+                                    dirhash(
+                                        'scp/plugins/bot',
+                                        'sha256',
+                                        excluded_extensions=['pyc']
+                                    )
+                                )
+                            ),
+                        ),
+                    ),
+                ),
+            )
+
+
 @bot.on_callback_query(
     help_button_create
     & (bot.filters.user(bot._sudo) | bot.filters.user(info['_user_id'])),
@@ -141,15 +188,7 @@ async def help_button(_, query):
         curr_page = int(prev_match.group(1))
         await editMessage(
             query,
-            text=user.md.KanTeXDocument(
-                user.md.Section(
-                    'Help module',
-                    user.md.KeyValueItem(
-                        user.md.Bold('Prefixes'),
-                        user.md.Code(' '.join(prefixes)),
-                    ),
-                ),
-            ),
+            text=helpMessage,
             reply_markup=InlineKeyboardMarkup(
                 paginate_modules(curr_page - 1, HELP_COMMANDS, 'help'),
             ),
@@ -160,15 +199,7 @@ async def help_button(_, query):
         next_page = int(next_match.group(1))
         await editMessage(
             query,
-            text=user.md.KanTeXDocument(
-                user.md.Section(
-                    'Help module',
-                    user.md.KeyValueItem(
-                        user.md.Bold('Prefixes'),
-                        user.md.Code(' '.join(prefixes)),
-                    ),
-                ),
-            ),
+            text=helpMessage,
             reply_markup=InlineKeyboardMarkup(
                 paginate_modules(next_page + 1, HELP_COMMANDS, 'help'),
             ),
@@ -178,15 +209,7 @@ async def help_button(_, query):
     elif back_match:
         await editMessage(
             query,
-            text=user.md.KanTeXDocument(
-                user.md.Section(
-                    'Help module',
-                    user.md.KeyValueItem(
-                        user.md.Bold('Prefixes'),
-                        user.md.Code(' '.join(prefixes)),
-                    ),
-                ),
-            ),
+            text=helpMessage,
             reply_markup=InlineKeyboardMarkup(
                 paginate_modules(0, HELP_COMMANDS, 'help'),
             ),
