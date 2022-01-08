@@ -29,7 +29,7 @@ async def _(_, message: user.types.Message):
         await message.reply_inline_bot_result(
             x.query_id,
             m.id,
-            quote=True
+            quote=True,
         )
 
 
@@ -47,7 +47,7 @@ async def _(_, query: bot.types.InlineQuery):
         user.types.InlineQueryResultArticle(
             title='help',
             input_message_content=user.types.InputTextMessageContent(
-                helpMessage
+                helpMessage,
             ),
             reply_markup=keyboard,
         ),
@@ -106,41 +106,41 @@ async def editMessage(
 
 
 helpMessage = user.md.KanTeXDocument(
-                user.md.Section(
-                    'Help module',
-                    user.md.KeyValueItem(
-                        user.md.Bold('Prefixes'),
-                        user.md.Code(' '.join(prefixes)),
-                    ),
-                    user.md.SubSection(
-                        'checksum(sha256):',
-                        user.md.KeyValueItem(
-                            user.md.Bold('user'),
-                            user.md.Code(
-                                str(
-                                    dirhash(
-                                        'scp/plugins/user',
-                                        'sha256',
-                                        excluded_extensions=['pyc']
-                                    )
-                                )
-                            ),
-                        ),
-                        user.md.KeyValueItem(
-                            user.md.Bold('bot'),
-                            user.md.Code(
-                                str(
-                                    dirhash(
-                                        'scp/plugins/bot',
-                                        'sha256',
-                                        excluded_extensions=['pyc']
-                                    )
-                                )
-                            ),
+    user.md.Section(
+        'Help module',
+        user.md.KeyValueItem(
+            user.md.Bold('Prefixes'),
+            user.md.Code(' '.join(prefixes)),
+        ),
+        user.md.SubSection(
+            'checksum(sha256):',
+            user.md.KeyValueItem(
+                user.md.Bold('user'),
+                user.md.Code(
+                    str(
+                        dirhash(
+                            'scp/plugins/user',
+                            'sha256',
+                            excluded_extensions=['pyc'],
                         ),
                     ),
                 ),
-            )
+            ),
+            user.md.KeyValueItem(
+                user.md.Bold('bot'),
+                user.md.Code(
+                    str(
+                        dirhash(
+                            'scp/plugins/bot',
+                            'sha256',
+                            excluded_extensions=['pyc'],
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    ),
+)
 
 
 @bot.on_callback_query(
