@@ -7,9 +7,6 @@ import asyncio
 import logging
 
 
-session.Session.notice_displayed = True
-
-
 class client(Client):
     def __init__(
         self,
@@ -46,25 +43,24 @@ class client(Client):
         timeout: float = session.Session.WAIT_TIMEOUT,
         sleep_threshold: float = None
     ):
-        try:
-            return await super().send(
-                data=data,
-                retries=retries,
-                timeout=timeout,
-                sleep_threshold=sleep_threshold,
-            )
-        except (
-            errors.SlowmodeWait,
-            errors.FloodWait,
-            errors.exceptions.flood_420.FloodWait,
-        ) as e:
-            await asyncio.sleep(e.x)
-            return await super().send(
-                data=data,
-                retries=retries,
-                timeout=timeout,
-                sleep_threshold=sleep_threshold,
-            )
+        while True:
+            try:
+                return await super().send(
+                    data=data,
+                    retries=retries,
+                    timeout=timeout,
+                    sleep_threshold=sleep_threshold,
+                )
+            except (
+                errors.SlowmodeWait,
+                errors.FloodWait,
+            ) as e:
+                logging.warning(f'Sleeping for - {e.x} | {e}')
+                await asyncio.sleep(e.x + 2)
+            except TimeoutError:
+                # attempt to fix TimeoutError on slower internet connection
+                await super().disconnect()
+                await super().connect()
 
     # from Kantek
     async def resolve_url(self, url: str) -> str:

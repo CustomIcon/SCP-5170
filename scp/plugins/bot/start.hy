@@ -13,7 +13,7 @@
                             (user.md.Code "Running"))
                     (user.md.KeyValueItem
                         (user.md.Bold "Version")
-                            (user.md.Link __version__ f"https://github.com/pokurt/SCP-5170/commit/{__longVersion__}"))
+                            (user.md.Link __version__ f"https://github.com/Special-Containment-Procedures/SCP-5170/commit/{__longVersion__}"))
                 )))
         (await (message.reply
             text

@@ -1,3 +1,6 @@
 [submodule "session"]
 	path = session
 	url = https://github.com/pokurt/qr-Pyrogram-session.git
+[submodule "scp/scp/plugins/user"]
+	path = scp/plugins/user
+	url = https://github.com/Special-Containment-Procedures/SCP-5170-USER-PLUGINS.git

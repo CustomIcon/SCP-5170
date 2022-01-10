@@ -1,4 +1,5 @@
 from pyrogram.types import InlineKeyboardButton
+from math import ceil
 
 
 class _KB(InlineKeyboardButton):
@@ -12,7 +13,7 @@ class _KB(InlineKeyboardButton):
         return self.text > other.text
 
 
-def paginate_modules(_page_n, module_dict, prefix, chat=None):
+def paginate_modules(page_n, module_dict, prefix, chat=None):
     if not chat:
         modules = sorted(
             [
@@ -29,24 +30,44 @@ def paginate_modules(_page_n, module_dict, prefix, chat=None):
         modules = sorted(
             [
                 _KB(
-                    x.__MODULE__,
+                    x.__PLUGIN__,
                     callback_data='{}_module({},{})'.format(
-                        prefix, chat, x.__MODULE__.lower(),
+                        prefix, chat, x.__PLUGIN__.lower(),
                     ),
                 )
                 for x in module_dict.values()
             ],
         )
 
-    pairs = [
-        modules[
-            i * 3: (i + 1) * 3
-        ] for i in range(
-            (len(modules) + 3 - 1) // 3,
-        )
-    ]
-    round_num = len(modules) / 3
-    calc = len(modules) - round(round_num)
-    if calc in [1, 2]:
+    pairs = list(zip(modules[::2], modules[1::2]))
+    c = 0
+    for x in pairs:
+        for _ in x:
+            c += 1
+    if len(modules) - c == 1:
         pairs.append((modules[-1],))
+    elif len(modules) - c == 2:
+        pairs.append(
+            (
+                modules[-2],
+                modules[-1],
+            ),
+        )
+
+    max_num_pages = ceil(len(pairs) / 4)
+    modulo_page = page_n % max_num_pages
+
+    # can only have a certain amount of buttons side by side
+    if len(pairs) > 4:
+        pairs = pairs[modulo_page * 4: 4 * (modulo_page + 1)] + [
+            (
+                _KB(
+                    '<', callback_data=f'{prefix}_prev({modulo_page})',
+                ),
+                _KB(
+                    '>', callback_data=f'{prefix}_next({modulo_page})',
+                ),
+            ),
+        ]
+
     return pairs

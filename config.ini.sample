@@ -7,3 +7,4 @@ SudoList = 1769494496
 Prefixes = ! .
 LogChannel = -100144441222
 IgnoreGroups = -1001234567
+plugins = bot user private

@@ -1,4 +1,4 @@
-from scp.utils.selfInfo import info
+from scp.utils.selfInfo import info  # type: ignore
 from scp import bot
 
 
