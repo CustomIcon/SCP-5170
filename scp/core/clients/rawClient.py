@@ -57,7 +57,7 @@ class client(Client):
             ) as e:
                 logging.warning(f'Sleeping for - {e.x} | {e}')
                 await asyncio.sleep(e.x + 2)
-            except TimeoutError:
+            except (TimeoutError, OSError):
                 # attempt to fix TimeoutError on slower internet connection
                 await self.stop()
                 await self.start()
