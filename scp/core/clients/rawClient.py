@@ -2,7 +2,7 @@ from pyrogram import Client, filters, types, raw, errors, session, handlers
 from scp.core.filters.Command import command
 from configparser import ConfigParser
 from kantex import md as Markdown
-from aiohttp import ClientSession, client_exceptions
+from aiohttp import ClientSession
 import asyncio
 import logging
 
@@ -59,8 +59,8 @@ class client(Client):
                 await asyncio.sleep(e.x + 2)
             except (TimeoutError, OSError):
                 # attempt to fix TimeoutError on slower internet connection
-                await self.stop()
-                await self.start()
+                await self.sesstion.stop()
+                await self.session.start()
 
     # from Kantek
     async def resolve_url(self, url: str) -> str:
