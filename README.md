@@ -19,7 +19,7 @@
  - python>=3.10
 
 ### Setup
- - clone this repository with `git clone` with `--recrusive` flag and change directory to the root of the project
+ - clone this repository with `git clone` with `--recursive` flag and change directory to the root of the project
  - create a `venv` with `python -m venv venv` and activate the `venv`
  - install all modules in requirements with `python -m pip install -r requirements.txt` and `python -m pip install -r session/requirements.txt`
  - move config sample from `config.ini.sample` to `config.ini` and fill in the configs

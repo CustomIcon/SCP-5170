@@ -2,7 +2,7 @@ from pyrogram import Client, filters, types, raw, errors, session, handlers
 from scp.core.filters.Command import command
 from configparser import ConfigParser
 from kantex import md as Markdown
-from aiohttp import ClientSession, client_exceptions
+from aiohttp import ClientSession
 import asyncio
 import logging
 
@@ -57,10 +57,10 @@ class client(Client):
             ) as e:
                 logging.warning(f'Sleeping for - {e.x} | {e}')
                 await asyncio.sleep(e.x + 2)
-            except TimeoutError:
+            except (TimeoutError, OSError):
                 # attempt to fix TimeoutError on slower internet connection
-                await super().disconnect()
-                await super().connect()
+                await self.sesstion.stop()
+                await self.session.start()
 
     # from Kantek
     async def resolve_url(self, url: str) -> str:
@@ -71,18 +71,6 @@ class client(Client):
         ) as response:
             e = await response.text()
         return e if e != 'false' and e[:-1] != url else None
-
-    async def Request(self, url: str, type: str, *args, **kwargs):
-        if type == 'get':
-            resp = await self.aioclient.get(url, *args, **kwargs)
-        elif type == 'post':
-            resp = await self.aioclient.post(url, *args, **kwargs)
-        elif type == 'put':
-            resp = await self.aioclient.put(url, *args, **kwargs)
-        try:
-            return await resp.json()
-        except client_exceptions.ContentTypeError:
-            return (await resp.read()).decode('utf-8')
 
     async def netcat(
         self,
