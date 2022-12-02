@@ -40,7 +40,8 @@ def command(
             bot_name=info['_user_username'].lower(
             ) if info['_user_username'] else None,
         )
-        if matches := re.search(regex, text, flags=re.IGNORECASE):
+        matches = re.search(regex, text, flags=re.IGNORECASE)
+        if matches:
             message.command = [matches.group(2)]
             if matches.group(4):  # The command has arguments
                 message.command.extend(
